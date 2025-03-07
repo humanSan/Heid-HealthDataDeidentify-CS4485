@@ -1,0 +1,83 @@
+Patient: Johnathan Smith
+Date of Birth: 03/15/1982
+Medical Record Number: 1234567
+Date of Visit: 10/26/2023
+Address: 123 Oak Street, Apt 13b,Bander, CA 91234
+Phone: 231-774-1234
+email: jmichael@att.com
+ 
+
+
+Provider: Dr. Eleanor Vance, MD
+
+Chief Complaint: "Persistent cough and shortness of breath for the past week."
+
+History of Present Illness (HPI):
+Mr. Smith presents to the clinic with a one-week history of a dry, hacking cough and progressive shortness of breath. He reports the cough began insidiously, initially mild, but has worsened over the past three days. He denies fever, chills, or night sweats. He describes the shortness of breath as a feeling of tightness in his chest, exacerbated by exertion. He has noticed a decrease in his exercise tolerance. He denies any recent travel or known exposures to sick individuals. He has tried over-the-counter cough suppressants with minimal relief.
+
+Past Medical History (PMH):
+
+Asthma (diagnosed in childhood)
+Seasonal allergies
+No known surgical history
+Medications:
+
+Albuterol inhaler (as needed)
+Fluticasone nasal spray (daily)
+Allergies:
+
+Penicillin (rash)
+Family History:
+
+Mother: Hypertension, type 2 diabetes
+Father: Coronary artery disease
+Social History:
+
+Non-smoker
+Occasional alcohol consumption (1-2 drinks per week)
+Works as a software engineer
+Reports moderate stress levels due to work deadlines
+Review of Systems (ROS):
+
+Constitutional: Denies fever, chills, fatigue, or weight loss.
+Respiratory: Positive for cough and shortness of breath. Denies hemoptysis or wheezing.
+Cardiovascular: Denies chest pain, palpitations, or edema.
+Gastrointestinal: Denies nausea, vomiting, or abdominal pain.
+Neurological: Denies headache, dizziness, or weakness.
+Physical Examination:
+
+General: Alert and oriented, appears uncomfortable due to respiratory distress.
+Vital Signs:
+Blood pressure: 130/80 mmHg
+Heart rate: 90 bpm
+Respiratory rate: 22 breaths/min
+Oxygen saturation: 92% on room air
+Temperature: 98.6°F (37°C)
+Respiratory: Diminished breath sounds bilaterally, with scattered wheezing.
+Cardiovascular: Regular heart rate and rhythm, no murmurs.
+Abdomen: Soft, non-tender.
+Extremities: No edema.
+Assessment:
+
+Acute exacerbation of asthma
+Possible bronchitis
+Plan:
+
+Administered nebulized albuterol in clinic.
+Prescribed prednisone 40mg daily for 5 days.
+Prescribed inhaled corticosteroid (fluticasone/salmeterol) twice daily.
+Ordered chest X-ray to rule out pneumonia.
+Instructed patient to monitor symptoms and return to clinic if symptoms worsen.
+Patient education provided on proper inhaler technique and asthma action plan.
+Chest X-Ray Report (10/26/2023):
+
+Mild hyperinflation of the lungs.
+No evidence of pneumonia or other acute pulmonary process.
+Follow-up Appointment:
+
+Scheduled for 11/02/2023.
+Provider Notes:
+Patient responded well to nebulized albuterol in clinic. Patient was given clear instructions on medication usage and when to return to clinic. Patient understands the return instructions.
+
+11/02/2023 (Follow-up):
+Patient reports significant improvement in cough and shortness of breath. Reports using inhaler as instructed. Examination shows improved breath sounds, minimal wheezing. Continue current medication regimen. Re-evaluate in 1 month.
