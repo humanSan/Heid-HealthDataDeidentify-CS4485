@@ -20,13 +20,11 @@ with open("ehr JMS.txt", "r") as file:
 
 
     # ssn
-    txt = re.sub(r"(\d{3}[-]\d{2}[-]\d{4}/", "*ssn*", txt)
+    txt = re.sub(r"\d{3}[-]\d{2}[-]\d{4}", "*ssn*", txt)
     
     
     # street-address
-    txt = re.sub(r"\b(\d{1,5}(\s\w+)+),([ -]([A-Z][a-z]+|\d+[A-Za-z]))+([, -]+([A-Z][a-z]+|[A-Z]{2,3}))*([, -]+(\d{4,6}))+([, -]+([A-Z][a-z]+|[A-Z]{2,3}))*", "*street-address*", txt)
-
-    
+    txt = re.sub(r"\b(\d{1,5}(\s\w+)+),([ -]([A-Z][a-z]+|\d+[A-Za-z]))+([, -]+([A-Z][a-z]+|[A-Z]{2,3}))*([, -]+(\d{4,6}))+([, -]+([A-Z][a-z]+|[A-Z]{2,3}))*", "*address*", txt)
     
 
     print(txt)
