@@ -18,4 +18,15 @@ with open("ehr JMS.txt", "r") as file:
 
     txt = strip_names(txt)
 
+
+    # ssn
+    txt = re.sub(r"(\d{3}[-]\d{2}[-]\d{4}/", "*ssn*", txt)
+
+    #
+    txt = re.sub(r"\d{1,5}(\s\w+)+),?\s?(Apt|Unit|Bldg|Apartment|Building|Suite)*?\.?\s?(\d{1,5})?", "*address*", txt)
+
+    #
+    txt = re.sub(
+
+
     print(txt)
