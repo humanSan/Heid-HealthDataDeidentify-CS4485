@@ -24,7 +24,7 @@ with open("ehr JMS.txt", "r") as file:
     
     
     # street-address
-    txt = re.sub(r"\b(\d{1,5}(\s\w+)+),?\s?((Apt|Unit|Bldg|Apartment|Building|Suite)*?\.?\s?(\d{1,5}))?\s*(([A-Z][a-z]+)?,?\s*?([A-Z]{2}|([A-Z][a-z]+))?)\s?(\d{1,6}|[A-Z]{2}\d{1,4})?,?\s?([A-Z][a-z]*\s)*", "*street-address*", txt)
+    txt = re.sub(r"\b(\d{1,5}(\s\w+)+),([ -][A-Z][a-z]+)+,?(([ -][A-Z]{2,3}|([ -][A-Z][a-z]+)+)),? ?\d{4,6}([ ][A-Z]{2,3})?,([ -,][A-Z][a-z]*)*", "*street-address*", txt)
 
     
     
