@@ -1,5 +1,7 @@
 import re
 
+from matchers.names import strip_names
+
 with open("ehr JMS.txt", "r") as file:
     txt = file.read()
 
@@ -13,5 +15,7 @@ with open("ehr JMS.txt", "r") as file:
     # substitute phone numbers using regex
     # works only for 10-digit numbers with optional +1
     txt = re.sub(r"(\+1\s*)?\(?(\d{3})\)?\s*-?\d{3}-?\s*\d{4}", "*phonenum*", txt)
+
+    txt = strip_names(txt)
 
     print(txt)
