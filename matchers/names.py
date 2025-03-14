@@ -18,6 +18,10 @@ def strip_names(text: str, two_way=False, sub="*name*"):
     names = honorific_matcher.findall(new_text)
     new_text = re.sub(honorific_matcher, sub, new_text)
 
+    honorific_matcher = re.compile(re_matcher + r"\.?(?:(?! \w+:)( [A-Z]\w+)){1,3}" + re_matcher)
+    names = honorific_matcher.findall(new_text)
+    new_text = re.sub(honorific_matcher, sub, new_text)
+
     # we take any last names we find and try to remove regular names from those
     for name in names:
         name_matcher = re.compile(r"(?!:)([A-Z]\w+ )+" + name.strip() + r"(?:(?! \w+:)( [A-Z]\w+))?")
