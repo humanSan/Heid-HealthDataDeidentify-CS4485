@@ -31,7 +31,7 @@ if 'file' not in st.session_state:
 st.header("Deidentification of Health Data")
 
 if st.session_state.file == None:
-   st.session_state.file = st.file_uploader(label = "Upload file here.", type=['txt', 'md', 'py'])
+   st.session_state.file = st.file_uploader(label = "Upload file here.", type=['txt', 'md'])
 
 def deidentify():
    # substitute dates using regex
