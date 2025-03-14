@@ -3,7 +3,7 @@ from io import StringIO
 import streamlit as st
 import re
 from matchers.addresses import strip_addresses
-from matchers.dates import strip_dates
+from matchers.dates import *
 from matchers.emails import strip_emails
 from matchers.names import strip_names
 from matchers.phonenums import strip_phone_nums
@@ -56,7 +56,7 @@ def deidentify():
          
          for dob in DOBs:
             if dob in lowered:
-               lines[i] = strip_dates(lines[i])
+               lines[i] = strip_dob(lines[i])
                break
 
 
@@ -81,6 +81,6 @@ if st.session_state.state < 2:
 else:
    st.markdown("""### Record Deidentified!""")
    st.text(st.session_state.output)
-   st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=""+st.session_state.file.name+".txt", mime="text/plain")
+   st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=""+st.session_state.file.name+"-deidentified.txt", mime="text/plain")
 
 
