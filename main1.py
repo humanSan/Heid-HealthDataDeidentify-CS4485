@@ -1,8 +1,12 @@
 import re
 import streamlit as st
 import tempfile
-
+from matchers.addresses import strip_addresses
+from matchers.dates import strip_dates
+from matchers.emails import strip_emails
 from matchers.names import strip_names
+from matchers.phonenums import strip_phone_nums
+from matchers.ssn import strip_ssn
 
 st.header("Deidentify Health Record")
 
@@ -25,4 +29,3 @@ with tempfile.TemporaryFile() as temp:
 
         st.download_button(label="Download Deidentified Record", data=txt, file_name=""+filename+".txt", mime="text/plain")
 
-        

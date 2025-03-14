@@ -1,13 +1,14 @@
 import os
 from io import StringIO
 import streamlit as st
-from dotenv import load_dotenv
-from pathlib import Path
-from google import genai
-from google.genai import types
 import re
+from matchers.addresses import strip_addresses
+from matchers.dates import strip_dates
+from matchers.emails import strip_emails
+from matchers.names import strip_names
+from matchers.phonenums import strip_phone_nums
+from matchers.ssn import strip_ssn
 
-load_dotenv()
 
 # client = genai.Client()
 
@@ -29,7 +30,7 @@ if 'file' not in st.session_state:
 
 st.header("Deidentification of Health Data")
 
-if st.session_state.state == 0:
+if st.session_state.file == None:
    st.session_state.file = st.file_uploader(label = "Upload file here.", type=['txt', 'md', 'py'])
 
 def deidentify():
@@ -38,44 +39,47 @@ def deidentify():
    if len(st.session_state.input) > 0:
       txt = st.session_state.input
 
-      txt = re.sub(r"\d{1,2}([\/-])\d{1,2}\1\d{2,4}", "*date*", txt)
-
       # substitute emails using regex
-      txt = re.sub(r"[\w.%+-]+@[\w.]+\.[A-Za-z]+", "*email*", txt)
-
-      # substitute phone numbers using regex
-      # works only for 10-digit numbers with optional +1
-      txt = re.sub(r"(\+1\s*)?\(?(\d{3})\)?\s*-?\d{3}-?\s*\d{4}", "*phonenum*", txt)
-
-      from matchers.names import strip_names
+      txt = strip_emails(txt)
+      txt = strip_phone_nums(txt)
       txt = strip_names(txt)
+      txt = strip_addresses(txt)
+
+      lines = txt.splitlines()
+
+      DOBs = ["dob", "d.o.b.", "date of birth", "dateof birth", "date ofbirth", "dateofbirth", "date-of-birth", "birthday", "birth day", "birth-day"]
+
+      for i in range(0, len(lines)):
+         lowered = lines[i].lower()
+         if "ssn" in lowered or "social security" in lowered or "s.s.n." in lowered:
+            lines[i] = strip_ssn(lines[i])
+         
+         for dob in DOBs:
+            if dob in lowered:
+               lines[i] = strip_dates(lines[i])
+               break
 
 
-      # ssn
-      txt = re.sub(r"\d{3}[-]\d{2}[-]\d{4}", "*ssn*", txt)
-
-
-      # street-address
-      txt = re.sub(r"\b(\d{1,5}(\s\w+)+),([ -]([A-Z][a-z]+|\d+[A-Za-z]))+([, -]+([A-Z][a-z]+|[A-Z]{2,3}))*([, -]+(\d{4,6}))+([, -]+([A-Z][a-z]+|[A-Z]{2,3}))*", "*address*", txt)
-
-      st.session_state.output = txt
+      st.session_state.output = "\n".join(lines)
 
       st.session_state.state = 2
 
 if st.session_state.state < 2:
    if st.session_state.file is not None:
-      st.session_state.state = 1
+      if(st.session_state.state==0):
+         st.session_state.state = 1
+         st.rerun()
+
       data = st.session_state.file.getvalue()
       stringio = StringIO(data.decode())
       st.session_state.input = stringio.read()
       st.write("")
-      st.markdown("### Your Input Record:")
+      st.markdown(f"### Your Input Record - {st.session_state.file.name}")
       st.text(st.session_state.input)
       st.write("")
       state = st.button("Deidentify Record", on_click = deidentify)
 else:
-   st.markdown("""---
-   ### Record Deidentified!""")
+   st.markdown("""### Record Deidentified!""")
    st.text(st.session_state.output)
    st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=""+st.session_state.file.name+".txt", mime="text/plain")
 
