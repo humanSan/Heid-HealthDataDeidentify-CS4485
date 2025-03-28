@@ -77,13 +77,13 @@ def deidentify():
          prompt = """
                   Task: Please anonymize the following clinical note using these instructions:
                   
-                  Replace the names and acronyms, initials, or honorifics like Ms/Mr/Dr/MD of doctor names, patient names, and the names of any M.D. or Dr. with the string '*name*'
+                  Replace the names and acronyms, initials, including honorifics like Ms, Mr, Dr, and MD of doctor names, patient names with the string '*name*'
                   Replace any names of social workers or health workers with the string '*name*'
                   Replace any locations or addresses such as "3970 Longview Drive, York, PA" with the string '*address*'
                   Replace any dates of birth with the string '*dob*'
                   Repace any SSN or Social Security Information with '*ssn*'
                   Replace clinic and hospital names with the string '*hospital*'
-                  Replace each lab result in the lab results section with the string '*lab_results*'
+                  Replace each lab result and the type of the lab result in the lab results section with the string '*lab_results*'
                   Replace each allergy in the allergies section with the string '*allergy*'
                   Replace each email address with the string '*email*'
                   Replace any Medicaid account information with the string '*medicaid*'
@@ -104,7 +104,7 @@ def deidentify():
          #print(prompt)
 
          response = client.models.generate_content(
-            model = "gemini-2.0-flash",
+            model = "gemini-1.5-flash",
             config=types.GenerateContentConfig(
                temperature=0
             ),
