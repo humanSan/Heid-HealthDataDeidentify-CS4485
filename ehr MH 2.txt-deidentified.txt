@@ -1,0 +1,107 @@
+Patient name: *name*
+DoB: *dob*
+SSN: *ssn*
+Date of Visit: 03/07/2024
+Address: *address*
+Phone: *phone*
+Email: *email*
+
+Provider name: *provider*
+Hospital name: *hospital*
+Address: *address*
+Phone: *phone*
+email: *email*
+
+Medicaid account: *medicaid*
+Social worker: *name*
+
+Chief Complaint: "Persistent joint pain and morning stiffness for the past month."
+
+History of Present Illness (HPI):
+*name* presents with complaints of progressive joint pain and stiffness, predominantly affecting her hands, wrists, and knees. The symptoms are most pronounced in the morning, lasting approximately 45 minutes before easing slightly with movement. She reports mild swelling in her fingers and occasional warmth around the joints. No known triggers or recent injuries. Over-the-counter NSAIDs provide limited relief. No associated fever, chills, or weight loss.
+
+Past Medical History (PMH):
+- Hypothyroidism (diagnosed 2015)
+- Osteoarthritis (diagnosed 2020)
+- No known surgical history
+
+Medications:
+- Levothyroxine 75 mcg daily
+- Ibuprofen 400 mg as needed for pain
+
+Allergies:
+- *allergy*
+- *allergy*
+- *allergy*
+- *allergy*
+- *allergy*
+- *allergy*
+- *allergy*
+- *allergy*
+- *allergy*
+
+Family History:
+- Mother: Rheumatoid arthritis
+- Father: Hypertension, stroke
+
+Social History:
+- Non-smoker
+- Occasional alcohol consumption (1-2 glasses of wine per week)
+- Works as a librarian
+- Enjoys gardening and knitting
+
+Review of Systems (ROS):
+- Constitutional: Denies fever, chills, or weight loss.
+- Musculoskeletal: Positive for joint pain, stiffness, and mild swelling.
+- Cardiovascular: Denies chest pain, palpitations, or edema.
+- Respiratory: Denies cough, shortness of breath, or wheezing.
+- Gastrointestinal: Denies nausea, vomiting, or abdominal pain.
+- Neurological: Denies headache, dizziness, or weakness.
+
+Physical Examination:
+- General: Alert and oriented, no acute distress.
+- Vital Signs:
+  - Blood pressure: 128/76 mmHg
+  - Heart rate: 74 bpm
+  - Respiratory rate: 16 breaths/min
+  - Oxygen saturation: 98% on room air
+  - Temperature: 98.4°F (36.9°C)
+- Musculoskeletal: Mild swelling and tenderness over the PIP and MCP joints bilaterally. Decreased grip strength. Knees show mild effusion with tenderness on palpation.
+- Cardiovascular: Regular heart rate and rhythm, no murmurs.
+- Respiratory: Clear breath sounds bilaterally.
+- Abdomen: Soft, non-tender.
+- Extremities: No edema.
+
+Assessment:
+- Suspected rheumatoid arthritis
+- Hypothyroidism, stable
+- Osteoarthritis, stable
+
+Plan:
+- Ordered rheumatoid factor (RF), anti-CCP antibodies, ESR, and CRP.
+- Prescribed a short course of prednisone 10 mg daily for 7 days to reduce inflammation.
+- Referred to rheumatology for further evaluation.
+- Advised continued use of NSAIDs for symptom relief and application of warm compresses.
+- Patient education provided on joint protection techniques and importance of regular exercise.
+
+Lab Results (03/09/2024):
+- *lab_results*
+- *lab_results*
+- *lab_results*
+- *lab_results*
+
+Follow-up Appointment:
+- Scheduled for 03/21/2024 with rheumatology.
+
+Provider Notes:
+- Discussed the likelihood of rheumatoid arthritis given the clinical presentation and lab findings. Patient was receptive to referral and understands the importance of early intervention.
+
+03/21/2024 (Rheumatology Follow-up):
+- Confirmed diagnosis of rheumatoid arthritis.
+- Initiated methotrexate 10 mg weekly with folic acid supplementation.
+- Provided detailed education on medication side effects and importance of regular lab monitoring.
+- Plan for gradual tapering of prednisone and reassessment in 4 weeks.
+- ecommended baseline lab tests prior to starting methotrexate, including CBC, LFTs, and renal function.
+- Advised patient on the importance of contraception while on methotrexate due to teratogenic risks.
+- Encouraged regular exercise to maintain joint flexibility and reduce stiffness.
+- Scheduled follow-up appointment in 4 weeks to monitor response to methotrexate and assess for potential side effects.

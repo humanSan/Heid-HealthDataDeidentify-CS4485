@@ -9,13 +9,9 @@ from matchers.emails import strip_emails
 from matchers.names import strip_names
 from matchers.phonenums import strip_phone_nums
 from matchers.ssn import strip_ssn
-from dotenv import load_dotenv
-from pathlib import Path
-from google import genai
-from google.genai import types
 
-load_dotenv()
-client = genai.Client()
+
+# client = genai.Client()
 
 st.set_page_config(
         page_title="DeIdentify Health Info",
@@ -41,9 +37,7 @@ if st.session_state.file == None:
    st.session_state.file = st.file_uploader(label = "Upload file here.", type=['txt', 'md'])
 
 def deidentify():
-   phiList = []
-   with(open("phi2.txt") as phi2):
-      phiList = phi2.readlines()
+
    
    # substitute dates using regex
    # covers dates in the form 03/07/2025, 3-7-25, etc.
@@ -71,48 +65,10 @@ def deidentify():
                   lines[i] = strip_dob(lines[i])
                   break
 
-         st.session_state.output = "\n".join(lines)
       elif(method=="LLM"):
-         
-         prompt = """
-                  Task: Please anonymize the following clinical note using these instructions:
-                  
-                  Replace the names and acronyms, initials, or honorifics like Ms/Mr/Dr/MD of doctor names, patient names, and the names of any M.D. or Dr. with the string '*name*'
-                  Replace any names of social workers or health workers with the string '*name*'
-                  Replace any locations or addresses such as "3970 Longview Drive, York, PA" with the string '*address*'
-                  Replace any dates of birth with the string '*dob*'
-                  Repace any SSN or Social Security Information with '*ssn*'
-                  Replace clinic and hospital names with the string '*hospital*'
-                  Replace each lab result in the lab results section with the string '*lab_results*'
-                  Replace each allergy in the allergies section with the string '*allergy*'
-                  Replace each email address with the string '*email*'
-                  Replace any Medicaid account information with the string '*medicaid*'
-                  Replace each provider name with the string '*provider*'
-                  Replace each phone number with the string '*phone*'
+         ()
 
-                  An example: The sentence "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*.
-
-                  You should only replace personal information and not generic words. For example, if the word 'name' or 'phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. Do NOT replace words that are actual personal information
-                  
-                  If the word for the information itself is in the record, like the word "Phone", do not replace it with *phone*. Only the actual personal information should be replaced.
-                  THE OUTPUT SHOULD INCLUDE ONLY THE ANONYMIZED HEALTH RECORD WITH NO OTHER TEXT.
-
-                  Health Record:
-
-                  """ + txt
-         
-         #print(prompt)
-
-         response = client.models.generate_content(
-            model = "gemini-2.0-flash",
-            config=types.GenerateContentConfig(
-               temperature=0
-            ),
-            contents=[prompt]
-         )
-         #print(response)
-         st.session_state.output = response.text
-
+      st.session_state.output = "\n".join(lines)
 
       st.session_state.state = 2
 

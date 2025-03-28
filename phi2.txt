@@ -1,0 +1,28 @@
+Patient name:
+Address (including street address, city, state, and zip code)
+Date of birth or DoB
+Social Security number or SSN
+Email address
+Provider name
+Hospital name
+Allergies (Morphine; Sulfa drugs)
+Lab Results
+Medicaid Account
+Social Worker
+Phone
+
+
+
+
+Replace any strings refer to a name or acronym or initials, patients' names, doctors' names, the names of the M.D. or Dr. with the string '*name*'
+Replace any strings that may be the name of a social worker or healthcare worker with the string '*name*'
+Replace any strings that might be a location or address, such as "3970 Longview Drive" with the string '*address*'
+Replace any strings that may refer to date of birth, sometimes indicated like "DoB" or "Date of birth" with the string '*dob*'
+Replace any strings that may refer to a SSN/Social security number, even if it is partially redacted with the string '*ssn*'
+Replace clinic and hospital names with with the string '*hospital*'
+Replace all lab results in the lab results section with with the string '*lab_results*'
+Replace all allergies in the allergies section with the string '*allergy*'
+Replace any strings that may be an email address with the string '*email*'
+Replace any string that may identify a Medicaid Account with the string '*medicaid*'
+Replace all provider names with the string '*provider*'
+Replace all strings that may refer to a phone number with the string '*phone*'

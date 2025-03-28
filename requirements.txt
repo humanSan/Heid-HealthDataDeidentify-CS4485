@@ -1,0 +1,5 @@
+streamlit
+pathlib
+google
+google.genai
+dotenv
