@@ -1,0 +1,18 @@
+1. Name
+2. Address
+3. Dates
+4. Phone numbers;
+5. Fax numbers;
+6. Electronic mail addresses;
+7. Social Security numbers;
+8. Medical record numbers;
+9. Health plan beneficiary numbers;
+10. Account numbers;
+11. Certificate/license numbers;
+12. serial numbers
+13. Device identifiers; *device*
+14. Web Universal Resource Locators (URLs); *url*
+15. Internet Protocol (IP) address numbers; *ip_address*
+16. Biometric identifiers *biometric*
+17. Full face photographic images and any comparable images; and
+18. Unique identifying number, characteristic, or code *id*

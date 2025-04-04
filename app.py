@@ -23,6 +23,14 @@ st.set_page_config(
 
 method = st.sidebar.radio("Method", ["LLM", "RegEx"])
 
+phi_list = None
+
+if method == "RegEx":
+   st.sidebar.radio("PHI List", ["PHI 1"])
+elif method == "LLM":
+   st.sidebar.radio("PHI List", ["PHI 2", "PHI 3"])
+
+
 if 'state' not in st.session_state:
    st.session_state.state = 0
 
@@ -50,7 +58,7 @@ def deidentify():
    if len(st.session_state.input) > 0:
       txt = st.session_state.input
 
-      if(method=="RegEx"):
+      if(phi_list=="PHI 1"):
          # substitute emails using regex
          txt = strip_emails(txt)
          txt = strip_phone_nums(txt)
@@ -73,33 +81,69 @@ def deidentify():
 
          st.session_state.output = "\n".join(lines)
       elif(method=="LLM"):
-         
-         prompt = """
-                  Task: Please anonymize the following clinical note using these instructions:
-                  
-                  Replace the names and acronyms, initials, including honorifics like Ms, Mr, Dr, and MD of doctor names, patient names with the string '*name*'
-                  Replace any names of social workers or health workers with the string '*name*'
-                  Replace any locations or addresses such as "3970 Longview Drive, York, PA" with the string '*address*'
-                  Replace any dates of birth with the string '*dob*'
-                  Repace any SSN or Social Security Information with '*ssn*'
-                  Replace clinic and hospital names with the string '*hospital*'
-                  Replace each lab result and the type of the lab result in the lab results section with the string '*lab_results*'
-                  Replace each allergy in the allergies section with the string '*allergy*'
-                  Replace each email address with the string '*email*'
-                  Replace any Medicaid account information with the string '*medicaid*'
-                  Replace each provider name with the string '*provider*'
-                  Replace each phone number with the string '*phone*'
+         prompt = ""
 
-                  An example: The sentence "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*.
+         if(phi_list=="PHI 2"):
+            prompt = """
+                     Task: Please anonymize the following clinical note using these instructions:
+                     
+                     Replace the names and acronyms, initials, including honorifics like Ms, Mr, Dr, and MD of doctor names, patient names with the string '*name*'
+                     Replace any names of social workers or health workers with the string '*name*'
+                     Replace any locations or addresses such as "3970 Longview Drive, York, PA" with the string '*address*'
+                     Replace any dates of birth with the string '*dob*'
+                     Repace any SSN or Social Security Information with '*ssn*'
+                     Replace clinic and hospital names with the string '*hospital*'
+                     Replace each lab result and the type of the lab result in the lab results section with the string '*lab_results*'
+                     Replace each allergy in the allergies section with the string '*allergy*'
+                     Replace each email address with the string '*email*'
+                     Replace any Medicaid account information with the string '*medicaid*'
+                     Replace each provider name with the string '*provider*'
+                     Replace each phone number with the string '*phone*'
 
-                  You should only replace personal information and not generic words. For example, if the word 'name' or 'phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. Do NOT replace words that are actual personal information
-                  
-                  If the word for the information itself is in the record, like the word "Phone", do not replace it with *phone*. Only the actual personal information should be replaced.
-                  THE OUTPUT SHOULD INCLUDE ONLY THE ANONYMIZED HEALTH RECORD WITH NO OTHER TEXT.
+                     An example: The sentence "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*.
 
-                  Health Record:
+                     You should only replace personal information and not generic words. For example, if the word 'name' or 'phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. Do NOT replace words that are actual personal information
+                     
+                     If the word for the information itself is in the record, like the word "Phone", do not replace it with *phone*. Only the actual personal information should be replaced.
+                     THE OUTPUT SHOULD INCLUDE ONLY THE ANONYMIZED HEALTH RECORD WITH NO OTHER TEXT.
 
-                  """ + txt
+                     Health Record:
+
+                     """ + txt
+         else:
+            prompt = """
+                     Task: Please anonymize the following clinical note using these instructions:
+                     
+                     Replace the names and acronyms, initials, including honorifics like Ms, Mr, Dr, and MD of doctor names, patient names with the string '*name*'
+                     Replace any names of people (also remove any attached honorifics, initials, or acronyms) with the string '*name*'
+                     Replace any locations or addresses such as "3970 Longview Drive, York, PA" with the string '*address*'
+                     Replace any dates with the string '*date*'
+                     Repace any SSN or Social Security Information with '*ssn*'
+                     Replace each email address with the string '*email*'
+                     Replace any account numbers with the string '*account_no*'
+                     Replace any medical record numbers with the string '*record_no*'
+                     Replace any health plan beneficiary numbers with the string '*health_plan_no*'
+                     Replace any account numbers with the string '*account_no*'
+                     Replace any certificate/license numbers with the string '*license*'
+                     Replace each phone number with the string '*phone*'
+                     Replace each fax number with the string '*fax*'
+                     Replace any unique identifying numbers, characteristics, or codes with '*id*'
+                     Replace any biometric identifiers with '*biometric*'
+                     Replace any IP address numbers with '*ip_address*'
+                     Replace any device identifiers with '*device*'
+                     Replace any Universal Resource Locators (URL) with '*url*'
+                     Replace any serial numbers with '*serial*'
+
+                     An example: The string "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*"
+
+                     You should only replace personal information and not generic words. For example, if the word 'Name' or 'Phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. ONLY replace words that contain actual personal information
+                     
+                     If the word for the information itself is in the record, like the word "Phone", do not replace it with *phone*. Only the actual personal information should be replaced.
+                     THE OUTPUT SHOULD INCLUDE ONLY THE ANONYMIZED HEALTH RECORD WITH NO OTHER TEXT.
+
+                     Health Record:
+
+                     """ + txt
          
          #print(prompt)
 
@@ -133,6 +177,7 @@ if st.session_state.state < 2:
 else:
    st.markdown("""### Record Deidentified!""")
    st.text(st.session_state.output)
-   st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=""+st.session_state.file.name+"-deidentified.txt", mime="text/plain")
+   download_name = os.path.splitext(st.session_state.file.name)[0] + "-deidentified.txt"
+   st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=download_name, mime="text/plain")
 
 

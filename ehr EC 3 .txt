@@ -1,0 +1,193 @@
+Patient Name: Emily Carter
+Date of Birth: 11/05/1988
+Medical record number:TXB4459-BS34334
+SSN: 321-67-8923
+Date of Visit: 02/14/2024
+Address: 789 Willow Lane, Apt 34, Brookfield, TX 75001
+Phone: 214-555-6790
+Email: emily.carter@email.com
+Health plan beneficiary number: 888-6765-1110
+Device identifier:PM4437-BTX33457
+Pacemaker serial numbers:B1001-7786432
+Code:772980014
+
+Provider: Dr. Benjamin Wright, MD
+Hospital Name: Greenfield Medical Center
+license number: MD77-786123
+Fax number: 322-551-7700
+Address: 159 Oakwood Drive, Greenfield, TX 76021
+
+Account: 4875 2198 6623 7741
+Social Worker: Ms. Linda Shaw
+Certificate number:SW788a-7898
+Health Insurance: BCBSX-We32445033
+Group no.: 614277
+Fax no.: 800-677-1254
+email: info@bcbstexas.com
+URL:www.bcbsx.com
+
+Chief Complaint: "Severe headaches and dizziness for the past two weeks."
+
+History of Present Illness (HPI):
+Ms. Carter presents with complaints of severe, persistent headaches accompanied by dizziness and occasional nausea. Symptoms began gradually and have been worsening over the past two weeks. She describes the headache as a constant pressure, predominantly in the frontal and temporal regions. No known history of migraines. Over-the-counter pain relievers provide minimal relief. No recent head trauma. Denies fever, vision changes, or weakness.
+
+Past Medical History (PMH):
+
+Hypertension (diagnosed 2019)
+
+Anxiety disorder (diagnosed 2021)
+
+No known surgical history
+
+Medications:
+
+Lisinopril 10 mg daily
+
+Alprazolam 0.5 mg as needed for anxiety
+
+Acetaminophen 500 mg as needed for pain
+
+Allergies:
+
+Penicillin
+
+NSAIDs (e.g., ibuprofen, naproxen)
+
+Latex
+
+Family History:
+
+Mother: Hypertension, migraines
+
+Father: Type 2 diabetes, stroke
+
+Biometric: Fingerprint Recognition 
+
+Social History:
+
+Non-smoker
+
+Occasional alcohol consumption (1-2 drinks per week)
+
+Works as a graphic designer
+
+Enjoys yoga and reading
+
+Review of Systems (ROS):
+
+Constitutional: Denies fever, chills, or weight loss.
+
+Neurological: Positive for headaches and dizziness. Denies numbness or weakness.
+
+Cardiovascular: Denies chest pain, palpitations, or shortness of breath.
+
+Respiratory: Denies cough, wheezing, or dyspnea.
+
+Gastrointestinal: Reports occasional nausea. Denies vomiting or diarrhea.
+
+Physical Examination:
+
+General: Alert and oriented, appears slightly fatigued.
+
+Vital Signs:
+
+Blood pressure: 142/88 mmHg
+
+Heart rate: 78 bpm
+
+Respiratory rate: 18 breaths/min
+
+Oxygen saturation: 99% on room air
+
+Temperature: 98.1°F (36.7°C)
+
+Neurological: Cranial nerves intact. No focal neurological deficits.
+
+Cardiovascular: Regular heart rate and rhythm, no murmurs.
+
+Respiratory: Clear breath sounds bilaterally.
+
+Abdomen: Soft, non-tender.
+
+Assessment:
+
+Likely tension headaches vs. early migraines
+
+Hypertension, mildly elevated
+
+Anxiety disorder
+
+Plan:
+
+Prescribed sumatriptan 50 mg as needed for severe headaches.
+
+Advised patient to keep a headache diary to track triggers and frequency.
+
+Recommended increased hydration and stress management techniques.
+
+Adjusted lisinopril dosage to 20 mg daily to better control blood pressure.
+
+Referred to neurology for further evaluation.
+
+Patient education provided on lifestyle modifications to manage headaches and hypertension.
+
+Lab Results (02/16/2024):
+
+CBC: Normal
+
+Electrolytes: Normal
+
+MRI Brain: No acute abnormalities detected
+
+Follow-up Appointments:
+
+Scheduled for 02/28/2024 with neurology.
+
+Additional follow-up scheduled for 04/10/2024 to reassess headache frequency and medication effectiveness.
+
+Blood pressure check-in scheduled for 03/20/2024 to monitor response to adjusted lisinopril dosage.
+
+Provider Notes:
+
+Patient was receptive to headache management strategies and willing to implement lifestyle changes.
+
+Discussed importance of medication adherence and monitoring blood pressure regularly.
+
+Recommended continued use of relaxation techniques, such as deep breathing and mindfulness, to manage anxiety-related symptoms.
+
+Encouraged patient to identify possible dietary triggers for headaches and maintain a balanced sleep schedule.
+
+Instructed patient to report any worsening symptoms, changes in headache pattern, or development of neurological deficits immediately.
+
+02/28/2024 (Neurology Follow-up):
+
+Patient reports mild improvement in symptoms.
+
+MRI confirmed no serious pathology.
+
+Diagnosed with tension-type headaches.
+
+Initiated amitriptyline 10 mg nightly for headache prevention.
+
+Advised continued monitoring and follow-up in 6 weeks.
+
+03/20/2024 (Blood Pressure Follow-up):
+
+Patient reports consistent use of lisinopril 20 mg daily.
+
+Blood pressure reading: 134/82 mmHg, showing mild improvement.
+
+Encouraged patient to maintain low-sodium diet and monitor at-home readings.
+
+Next follow-up scheduled in one month.
+
+04/10/2024 (Headache and Medication Follow-up):
+
+Patient reports further reduction in headache frequency and severity.
+
+Tolerating amitriptyline well with no significant side effects.
+
+Plan to continue current treatment and reassess in three months.
+
+Patient instructed to reach out if symptoms worsen or new concerns arise.
+
