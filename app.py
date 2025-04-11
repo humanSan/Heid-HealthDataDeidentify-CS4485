@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from google import genai
 from google.genai import types
+import yaml
 
 load_dotenv()
 client = genai.Client()
@@ -23,12 +24,27 @@ st.set_page_config(
 
 method = st.sidebar.radio("Method", ["LLM", "RegEx"])
 
-phi_list = None
+phi_list = ["Doc Name", "Patient Name", "All Names", "Social Worker Names", "Date of Birth", "All Dates", "Phone Number", "Fax Number", "Address", "Email", "SSN", "Medicaid Account", "Medical Record Number", "Health Plan Beneficiary Number", "All Account Numbers", "Certificate/License Number", "Serial Number", "Device Identifier", "URL", "IP Address", "Biometric Identifier", "Unique ID or Code", "Provider Name", "Hospital Name", "Allergies", "Lab Results"]
+
+phi_dict = {}
+
+phi_dict["PHI 3"] = ["All Names", "All Dates", "Phone Number", "Fax Number", "Address", "Email", "SSN", "Medical Record Number", "Health Plan Beneficiary Number", "All Account Numbers", "Certificate/License Number", "Serial Number", "Device Identifier", "URL", "IP Address", "Biometric Identifier", "Unique ID or Code"]
+
+phi_dict["PHI 2"] = ["Patient Name", "Doc Name", "Date of Birth", "SSN", "Email", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medicaid Account", "Social Worker Names", "Phone Number"]
+
+with open("prompts.yaml", "r") as prompt_file:
+   phi_prompts = yaml.safe_load(prompt_file)
+
+print(phi_prompts)
+
+phi = None
 
 if method == "RegEx":
-   st.sidebar.radio("PHI List", ["PHI 1"])
+   phi_no = st.sidebar.radio("PHI List", ["PHI 1"])
 elif method == "LLM":
-   st.sidebar.radio("PHI List", ["PHI 2", "PHI 3"])
+   phi_no = st.sidebar.radio("PHI List", ["PHI 2", "PHI 3"])
+   phi = st.sidebar.multiselect("PHI Items", phi_list, default=phi_dict[phi_no])
+
 
 
 if 'state' not in st.session_state:
@@ -82,68 +98,25 @@ def deidentify():
          st.session_state.output = "\n".join(lines)
       elif(method=="LLM"):
          prompt = ""
+         
+         remove_items = [phi_prompts[item] for item in phi]
 
-         if(phi_list=="PHI 2"):
-            prompt = """
-                     Task: Please anonymize the following clinical note using these instructions:
-                     
-                     Replace the names and acronyms, initials, including honorifics like Ms, Mr, Dr, and MD of doctor names, patient names with the string '*name*'
-                     Replace any names of social workers or health workers with the string '*name*'
-                     Replace any locations or addresses such as "3970 Longview Drive, York, PA" with the string '*address*'
-                     Replace any dates of birth with the string '*dob*'
-                     Repace any SSN or Social Security Information with '*ssn*'
-                     Replace clinic and hospital names with the string '*hospital*'
-                     Replace each lab result and the type of the lab result in the lab results section with the string '*lab_results*'
-                     Replace each allergy in the allergies section with the string '*allergy*'
-                     Replace each email address with the string '*email*'
-                     Replace any Medicaid account information with the string '*medicaid*'
-                     Replace each provider name with the string '*provider*'
-                     Replace each phone number with the string '*phone*'
+         
+         prompt = """
+                  Task: Please anonymize the following clinical note using these instructions:
+                  
+                  """ + "\n".join(remove_items) + """
 
-                     An example: The sentence "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*.
+                  An example: The string "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*"
 
-                     You should only replace personal information and not generic words. For example, if the word 'name' or 'phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. Do NOT replace words that are actual personal information
-                     
-                     If the word for the information itself is in the record, like the word "Phone", do not replace it with *phone*. Only the actual personal information should be replaced.
-                     THE OUTPUT SHOULD INCLUDE ONLY THE ANONYMIZED HEALTH RECORD WITH NO OTHER TEXT.
+                  You should only replace personal information and not generic words. For example, if the word 'Name' or 'Phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. ONLY replace words that contain actual personal information
+                  
+                  If the word for the information itself is in the record, like the word "Phone", do not replace it with *phone*. Only the actual personal information should be replaced.
+                  THE OUTPUT SHOULD INCLUDE ONLY THE ANONYMIZED HEALTH RECORD WITH NO OTHER TEXT.
 
-                     Health Record:
+                  Health Record:
 
-                     """ + txt
-         else:
-            prompt = """
-                     Task: Please anonymize the following clinical note using these instructions:
-                     
-                     Replace the names and acronyms, initials, including honorifics like Ms, Mr, Dr, and MD of doctor names, patient names with the string '*name*'
-                     Replace any names of people (also remove any attached honorifics, initials, or acronyms) with the string '*name*'
-                     Replace any locations or addresses such as "3970 Longview Drive, York, PA" with the string '*address*'
-                     Replace any dates with the string '*date*'
-                     Repace any SSN or Social Security Information with '*ssn*'
-                     Replace each email address with the string '*email*'
-                     Replace any account numbers with the string '*account_no*'
-                     Replace any medical record numbers with the string '*record_no*'
-                     Replace any health plan beneficiary numbers with the string '*health_plan_no*'
-                     Replace any account numbers with the string '*account_no*'
-                     Replace any certificate/license numbers with the string '*license*'
-                     Replace each phone number with the string '*phone*'
-                     Replace each fax number with the string '*fax*'
-                     Replace any unique identifying numbers, characteristics, or codes with '*id*'
-                     Replace any biometric identifiers with '*biometric*'
-                     Replace any IP address numbers with '*ip_address*'
-                     Replace any device identifiers with '*device*'
-                     Replace any Universal Resource Locators (URL) with '*url*'
-                     Replace any serial numbers with '*serial*'
-
-                     An example: The string "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*"
-
-                     You should only replace personal information and not generic words. For example, if the word 'Name' or 'Phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. ONLY replace words that contain actual personal information
-                     
-                     If the word for the information itself is in the record, like the word "Phone", do not replace it with *phone*. Only the actual personal information should be replaced.
-                     THE OUTPUT SHOULD INCLUDE ONLY THE ANONYMIZED HEALTH RECORD WITH NO OTHER TEXT.
-
-                     Health Record:
-
-                     """ + txt
+                  """ + txt
          
          #print(prompt)
 
