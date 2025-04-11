@@ -30,7 +30,7 @@ phi_dict = {}
 
 phi_dict["PHI 3"] = ["All Names", "All Dates", "Phone Number", "Fax Number", "Address", "Email", "SSN", "Medical Record Number", "Health Plan Beneficiary Number", "All Account Numbers", "Certificate/License Number", "Serial Number", "Device Identifier", "URL", "IP Address", "Biometric Identifier", "Unique ID or Code"]
 
-phi_dict["PHI 2"] = ["Patient Name", "Doc Name", "Date of Birth", "SSN", "Email", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medicaid Account", "Social Worker Names", "Phone Number"]
+phi_dict["PHI 2"] = ["Patient Name", "Doc Name", "Date of Birth", "SSN", "Address", "Email", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medicaid Account", "Social Worker Names", "Phone Number"]
 
 with open("prompts.yaml", "r") as prompt_file:
    phi_prompts = yaml.safe_load(prompt_file)
@@ -104,7 +104,7 @@ def deidentify():
          
          prompt = """
                   Task: Please anonymize the following clinical note using these instructions:
-                  
+
                   """ + "\n".join(remove_items) + """
 
                   An example: The string "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*"
