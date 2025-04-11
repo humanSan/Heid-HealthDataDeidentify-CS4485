@@ -149,8 +149,8 @@ if st.session_state.state < 2:
       state = st.button("Deidentify Record", on_click = deidentify)
 else:
    st.markdown("""### Record Deidentified!""")
-   st.text(st.session_state.output)
    download_name = os.path.splitext(st.session_state.file.name)[0] + "-deidentified.txt"
    st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=download_name, mime="text/plain")
-
+   st.text(st.session_state.output)
+   
 
