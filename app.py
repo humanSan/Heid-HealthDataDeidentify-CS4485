@@ -148,6 +148,17 @@ if st.session_state.state < 2:
       st.write("")
       state = st.button("Deidentify Record", on_click = deidentify)
 else:
+
+   # PLEASE PUT CODE FOR REIDENTIFICATION HERE
+
+   # to get the ORIGINAL phi, use st.session_state.input
+   # to get the DEIDENTIFIED phi, use st.session_state.output
+   # if you want any data to persist across streamlit page refreshes, you MUST use st.session_state.var, not just var = data
+
+   # FIRST: we need to figure out which items were actually removed. to do this, iterate over the lines in the deidentified phi, and for every tag like *name*, *date*, etc, look at the same line in the original phi, and find out which characters were removed
+   # Put these deidentified items in a dictionary, or write them to a file
+   # Take those items and hash them or whatever you need to do for reidentification
+
    st.markdown("""### Record Deidentified!""")
    download_name = os.path.splitext(st.session_state.file.name)[0] + "-deidentified.txt"
    st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=download_name, mime="text/plain")
