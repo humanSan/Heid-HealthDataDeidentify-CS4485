@@ -9,6 +9,7 @@ from matchers.emails import strip_emails
 from matchers.names import strip_names
 from matchers.phonenums import strip_phone_nums
 from matchers.ssn import strip_ssn
+from reidentification import *
 from dotenv import load_dotenv
 from pathlib import Path
 from google import genai
