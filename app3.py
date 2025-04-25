@@ -69,6 +69,18 @@ def deidentify_ehr_iterative_selective(text):
 
     return updated_text, de_id_map
 
+def reidentify_ehr(text, id_map):
+    # This regex matches [TYPE#123] format
+    pattern = re.compile(r"\[(\w+#\d+)\]")
+
+    def replace(match):
+        # drop the brackets
+        # try to replace this token using the id_map
+        # if it’s not in the map, just leave the token as is
+        key = match.group(1)
+        return id_map.get(key, match.group(0))
+
+    return pattern.sub(replace, text)
 
 with(open("ehr EC 3 .txt") as phi2):
     ehr_text = ''.join(list(phi2.readlines()))
@@ -76,3 +88,7 @@ with(open("ehr EC 3 .txt") as phi2):
     # Apply the selective iterative de-identification function
     deidentified_ehr, id_map = deidentify_ehr_iterative_selective(ehr_text)
     print(deidentified_ehr, id_map)
+
+    # prin reidentified text
+    reidentified_text = reidentify_ehr(deidentified_ehr, id_map)
+    print(reidentified_text)
