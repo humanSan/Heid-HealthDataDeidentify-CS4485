@@ -44,8 +44,9 @@ def deidentify_ehr_iterative_selective(text):
         (r"(email:|Email:)\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})", "EMAIL"),
         (r"(Medicaid account:|Account:)\s*(\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b)", "ACCOUNT"),
         (r"(Hospital name:|Hospital Name:)\s*(\w+(?: \w+)+)", "HOSPITAL"),
-        (r"(Lab Results(?:\s*\((?:\d{2}/\d{2}/\d{4})\))?:)((?:\n-\s.+)+)", "LAB"),
+        (r"(Lab Results\s*(?:\((?:[0-1]?[0-9]/[0-3]?[0-9]/\d{4})\))?:)\s*((?:\n-\s*.+)+)", "LAB"),
         (r"(Allergies:)((?:\n-?\s(?![\w ]+:).+)+)", "ALLERGIES"),
+        (r"(Lab Results\s*(?:\((?:[0-1]?[0-9]/[0-3]?[0-9]/\d{4})\))?:)((?:\n-?\s(?!Follow+).+)+)", "LAB"),
         (r"(Health plan beneficiary number:)\s*(\d{3}-\d{4}-\d{4})", "NUMBER"),
         (r"(Device identifier:)\s*([A-Za-z0-9]{6}-[A-Za-z0-9]{8})", "NUMBER"),
         (r"(Pacemaker serial numbers:)\s*([A-Za-z0-9]{5}-[A-Za-z0-9]{7})", "NUMBER"),
@@ -82,7 +83,7 @@ def reidentify_ehr(text, id_map):
 
     return pattern.sub(replace, text)
 
-with(open("ehr EC 3 .txt") as phi2):
+with(open("ehr EC 3.txt") as phi2):
     ehr_text = ''.join(list(phi2.readlines()))
 
     # Apply the selective iterative de-identification function
