@@ -86,17 +86,34 @@ if 'encrypted_map' not in st.session_state:
 
 st.header("🧬 Health Data Deidentifier")
 
-if st.session_state.state <= 2 or st.session_state.state > 4:
-   if st.sidebar.button("Reidentify", icon=":material/fingerprint:", type="primary"):
-      st.session_state.state = 3
-      st.session_state.input = ""
-      st.session_state.output = ""
-      st.session_state.reid_map = None
-      st.session_state.file = None
-      st.session_state.customcode = None
-      st.session_state.encrypted_map = None
+def goDeid():
+   st.session_state.state = 0
+   st.session_state.input = ""
+   st.session_state.output = ""
+   st.session_state.reid_map = None
+   st.session_state.file = None
+   st.session_state.customcode = None
+   st.session_state.encrypted_map = None
+   st.rerun()
 
-      st.rerun()
+def goReid():
+   st.session_state.state = 3
+   st.session_state.input = ""
+   st.session_state.output = ""
+   st.session_state.reid_map = None
+   st.session_state.file = None
+   st.session_state.customcode = None
+   st.session_state.encrypted_map = None
+
+   st.rerun()
+   
+
+if st.session_state.state <= 2 or st.session_state.state > 4:
+   if st.sidebar.button("Deidentiy", icon=":material/shuffle:", type="primary"):
+      goDeid()
+   if st.sidebar.button("Reidentify", icon=":material/fingerprint:", type="secondary"):
+      goReid()
+      
    method = st.sidebar.radio("Method", ["LLM", "RegEx"])
    if method == "RegEx":
       phi_no = st.sidebar.radio("PHI List", ["PHI 1", "PHI 3"], index=0)
@@ -104,15 +121,12 @@ if st.session_state.state <= 2 or st.session_state.state > 4:
       phi_no = st.sidebar.radio("PHI List", phi_dict.keys(), index=0)
       phi = st.sidebar.multiselect("Select PHI Items to Remove", phi_list, default=phi_dict[phi_no])
 else:
-   if st.sidebar.button("Deidentiy", icon=":material/shuffle:", type="primary"):
-      st.session_state.state = 0
-      st.session_state.input = ""
-      st.session_state.output = ""
-      st.session_state.reid_map = None
-      st.session_state.file = None
-      st.session_state.customcode = None
-      st.session_state.encrypted_map = None
-      st.rerun()
+   if st.sidebar.button("Deidentiy", icon=":material/shuffle:", type="secondary"):
+      goDeid()
+      
+   if st.sidebar.button("Reidentify", icon=":material/fingerprint:", type="primary"):
+      goReid()
+   
 
 def reidentify(ehr_text, reid_map):
    # return "Ha nothing here"
@@ -324,30 +338,30 @@ elif st.session_state.state == 3:
 
    if input_password and st.session_state.file is not None and st.session_state.reid_map is not None:
       if st.button("Reidentify Record", icon=":material/start:", key="reidentify-enter"):
-         # try:
+         try:
 
-         data = st.session_state.file.getvalue()
-         stringio = StringIO(data.decode())
-         st.session_state.input = stringio.read()
+            data = st.session_state.file.getvalue()
+            stringio = StringIO(data.decode())
+            st.session_state.input = stringio.read()
 
-         st.session_state.encrypted_map = st.session_state.reid_map.getvalue()
-         # stringio = StringIO(reid_data.decode())
-         # st.session_state.encrypted_map = ast.literal_eval(stringio.read())
+            st.session_state.encrypted_map = st.session_state.reid_map.getvalue()
+            # stringio = StringIO(reid_data.decode())
+            # st.session_state.encrypted_map = ast.literal_eval(stringio.read())
 
-         decrypt(input_password)
+            decrypt(input_password)
 
+            
+            
+            
+            #data is a string, reid_data is a python dictionary
+            st.session_state.output = reidentify(st.session_state.input, st.session_state.reid_map)
+
+         except:
+            st.markdown("#### ❌ Reidentification failed. Your passcode may be incorrect.")
          
-         
-         
-         #data is a string, reid_data is a python dictionary
-         st.session_state.output = reidentify(st.session_state.input, st.session_state.reid_map)
-
-         # except:
-         #    st.markdown("## Reidentification Failed. Your passcode may be incorrect.")
-         
-         # else:
-         st.session_state.state = 4
-         st.rerun()
+         else:
+            st.session_state.state = 4
+            st.rerun()
 
 
    
