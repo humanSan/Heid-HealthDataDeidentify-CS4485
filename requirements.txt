@@ -4,3 +4,7 @@ google
 google.genai
 dotenv
 pyyaml
+cryptography
+base64
+secrets
+uuid
