@@ -19,6 +19,11 @@ import ast
 import copy
 from cryptography.fernet import Fernet
 import base64
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.backends import default_backend
+import secrets
+import uuid
 
 load_dotenv()
 client = genai.Client()
@@ -79,10 +84,10 @@ if 'customcode' not in st.session_state:
 if 'encrypted_map' not in st.session_state:
    st.session_state.encrypted_map = None
 
-st.header("Health Data Deidentifier")
+st.header("🧬 Health Data Deidentifier")
 
 if st.session_state.state <= 2 or st.session_state.state > 4:
-   if st.sidebar.button("Reidentification Mode", type="primary"):
+   if st.sidebar.button("Reidentify", icon=":material/fingerprint:", type="primary"):
       st.session_state.state = 3
       st.session_state.input = ""
       st.session_state.output = ""
@@ -99,7 +104,7 @@ if st.session_state.state <= 2 or st.session_state.state > 4:
       phi_no = st.sidebar.radio("PHI List", phi_dict.keys(), index=0)
       phi = st.sidebar.multiselect("Select PHI Items to Remove", phi_list, default=phi_dict[phi_no])
 else:
-   if st.sidebar.button("Deidentification Mode", type="primary"):
+   if st.sidebar.button("Deidentiy", icon=":material/shuffle:", type="primary"):
       st.session_state.state = 0
       st.session_state.input = ""
       st.session_state.output = ""
@@ -217,16 +222,55 @@ def deidentify():
 
       st.session_state.state = 2
 
+iterations = 100_000
+
+def derive_key(password: bytes, salt: bytes) -> bytes:
+    """Derive a secret key from a given password and salt"""
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(), 
+        length=32, 
+        salt=salt,
+        iterations=iterations, 
+        backend=default_backend())
+    return base64.urlsafe_b64encode(kdf.derive(password))
+
+def password_encrypt(text: str, password: str) -> bytes:
+    salt = secrets.token_bytes(16) # Generate a salt
+    key = derive_key(password.encode(), salt) #enccode password as utf, send it to derive key, which generates a password in non base64, encodes it as b64 and returns it
+    encoded = text.encode()
+    return base64.urlsafe_b64encode(
+        b'%b%b%b' % (
+            salt,
+            iterations.to_bytes(4, 'big'),
+            base64.urlsafe_b64decode(Fernet(key).encrypt(encoded)),
+        )
+    )
+
+def password_decrypt(encrypted_data: bytes, password: str) -> str:
+    decoded = base64.urlsafe_b64decode(encrypted_data) # returns non base64 bytes
+    salt, iter, encrypted_txt = decoded[:16], decoded[16:20], base64.urlsafe_b64encode(decoded[20:])
+    iterations = int.from_bytes(iter, 'big')
+    key = derive_key(password.encode(), salt)
+    return Fernet(key).decrypt(encrypted_txt).decode()
+
+
 def encrypt():
+   st.session_state.encrypted_map = password_encrypt(st.session_state.reid_map, st.session_state.customcode)
+   return None
    fernet = Fernet(st.session_state.customcode.encode())
    st.session_state.encrypted_map = fernet.encrypt(st.session_state.reid_map.encode())
 
 def decrypt(code):
+   decoded_map = password_decrypt(st.session_state.encrypted_map, st.session_state.customcode)
+   st.session_state.reid_map = ast.literal_eval(decoded_map)
+   return None
    fernet = Fernet(code.encode())
    decoded_map = fernet.decrypt(st.session_state.encrypted_map).decode()
    st.session_state.reid_map = ast.literal_eval(decoded_map)
 
 if st.session_state.state < 2:
+   if st.session_state.state == 0:
+      st.subheader("🧮 Deidentify Record")
    if st.session_state.file == None:
       st.session_state.file = st.file_uploader(label = "Upload file here.", type=['txt', 'md'])
       
@@ -239,8 +283,8 @@ if st.session_state.state < 2:
       stringio = StringIO(data.decode())
       st.session_state.input = stringio.read()
       st.write("")
-      st.markdown(f"### Your Input Record - {st.session_state.file.name}")
-      state = st.button("Deidentify Record", on_click = deidentify)
+      st.subheader(f"Your Input Record - {st.session_state.file.name}")
+      state = st.button("Deidentify Record", icon=":material/start:", on_click = deidentify)
       st.write("")
       st.text(st.session_state.input)
       
@@ -256,18 +300,18 @@ elif st.session_state.state == 2:
    # Put these deidentified items in a dictionary, or write them to a file
    # Take those items and hash them or whatever you need to do for reidentification
 
-   st.markdown("""### Record Deidentified!""")
+   st.subheader("""✅ Record Deidentified!""")
    download_name = os.path.splitext(st.session_state.file.name)[0] + "-deidentified.txt"
-   st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=download_name, mime="text/plain")
+   st.download_button(label="Download Deidentified Record", icon=":material/download:", data=st.session_state.output, file_name=download_name, mime="text/plain")
 
    if(st.session_state.reid_map is not None):
-      if(st.button("Get Reidentification Map")):
+      if(st.button("Get Reidentification Map", icon=":material/key:")):
          st.session_state.state = 5
          st.rerun()
    st.text(st.session_state.output)
    
 elif st.session_state.state == 3:
-   st.subheader("Reidentification Mode")
+   st.subheader("📟 Reidentify Record")
    st.session_state.file = st.file_uploader(label = "Upload DEIDENTIFIED record here.", type=['txt', 'md'])
 
    st.session_state.reid_map = st.file_uploader(label = "Upload REIDENTIFICATION map here.", type=['map'])
@@ -279,7 +323,7 @@ elif st.session_state.state == 3:
    input_password = st.text_input(label="", key="customcode", type="password")
 
    if input_password and st.session_state.file is not None and st.session_state.reid_map is not None:
-      if st.button("Reidentify Record", key="reidentify-enter"):
+      if st.button("Reidentify Record", icon=":material/start:", key="reidentify-enter"):
          # try:
 
          data = st.session_state.file.getvalue()
@@ -326,14 +370,14 @@ elif st.session_state.state == 3:
    #       st.rerun()
 
 elif st.session_state.state == 4:
-   st.markdown("""### Record Reidentified!""")
+   st.subheader("""✅ Record Reidentified!""")
    download_name = os.path.splitext(st.session_state.file.name)[0] + "-reidentified.txt"
-   st.download_button(label="Download Reidentified Record", data=st.session_state.output, file_name=download_name, mime="text/plain")
+   st.download_button(label="Download Reidentified Record", icon=":material/download:", data=st.session_state.output, file_name=download_name, mime="text/plain")
    #st.text(st.session_state.input)
    #st.text(str(st.session_state.reid_map))
    st.text(st.session_state.output)
 elif st.session_state.state == 5:
-   st.markdown("### Get Reidentification Map")
+   st.subheader("📑 Get Reidentification Map")
    st.markdown("**To download the reidentification map, please generate a passcode for encryption. You must *use* this passcode later to reidentify the record. Store it in a safe place.**")
 
    if "pass_vis" not in st.session_state:
@@ -345,14 +389,14 @@ elif st.session_state.state == 5:
       st.session_state.gencode = None
 
    if st.button("Generate Random Passcode"):
-      key = Fernet.generate_key()
-      st.session_state.customcode = key.decode()
+      key = uuid.uuid4()
+      st.session_state.customcode = str(key)
       encrypt()
       print(type(key))
       st.rerun()
    st.write("Generating a passcode will reset any passcode you have entered below")
 
-   st.text_input(label="Your Passcode", type=show_pass, key="customcode", on_change=encrypt, disabled= True)
+   st.text_input(label="Your Passcode", type=show_pass, key="customcode", on_change=encrypt)
 
    # st.checkbox(label = "Show Passcode", key="pass_vis", value=False)
    st.write()
@@ -360,7 +404,10 @@ elif st.session_state.state == 5:
    if st.session_state.encrypted_map:
       reid_download_name = os.path.splitext(st.session_state.file.name)[0] + "-reid_encrypted.map"
 
-      st.download_button(label="Download Reidentification Map", data=st.session_state.encrypted_map, file_name=reid_download_name, mime="text/plain")
+      st.download_button(label="Confirm Passcode and Download Map", icon=":material/encrypted:", data=st.session_state.encrypted_map, file_name=reid_download_name, mime="text/plain")
+   
+      download_name = os.path.splitext(st.session_state.file.name)[0] + "-deidentified.txt"
+      st.download_button(label="Download Deidentified Record", icon=":material/download:", data=st.session_state.output, file_name=download_name, mime="text/plain")
 
 
 def generate_passcode():
