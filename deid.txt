@@ -1,41 +1,41 @@
-Patient Name: *name*
-Date of Birth: *date*
-Medical record number: *record_no*
-SSN: *ssn*
-Date of Visit: *date*
-Address: *address*
-Phone: *phone*
-Email: *email*
-Health plan beneficiary number: *health_plan_no*
-Device identifier: *device*
-Pacemaker serial numbers: *serial*
-Code: *id*
+Patient Name: [NAME#1]
+Date of Birth: [DOB#1]
+Medical record number: [RECORD_NO#1]
+SSN: [SSN#1]
+Date of Visit: [DATE#1]
+Address: [ADDRESS#1]
+Phone: [PHONE#1]
+Email: [EMAIL#1]
+Health plan beneficiary number: [HEALTH_PLAN_NO#1]
+Device identifier: [DEVICE#1]
+Pacemaker serial numbers: [SERIAL#1]
+Code: [ID#1]
 
-Provider: *name*, MD
-Hospital Name: *name*
-license number: *license*
-Fax number: *fax*
-Address: *address*
+Provider: [NAME#2]
+Hospital Name: [HOSPITAL#1]
+license number: [LICENSE#1]
+Fax number: [FAX#1]
+Address: [ADDRESS#2]
 
-Account: *account_no*
-Social Worker: *name*
-Certificate number: *license*
-Health Insurance: *name*
-Group no.: *id*
-Fax no.: *fax*
-email: *email*
-URL: *url*
+Account: [ACCOUNT_NO#1]
+Social Worker: [NAME#3]
+Certificate number: [LICENSE#2]
+Health Insurance: [ID#2]
+Group no.: [ID#3]
+Fax no.: [FAX#2]
+email: [EMAIL#2]
+URL: [URL#1]
 
 Chief Complaint: "Severe headaches and dizziness for the past two weeks."
 
 History of Present Illness (HPI):
-*name* presents with complaints of severe, persistent headaches accompanied by dizziness and occasional nausea. Symptoms began gradually and have been worsening over the past two weeks. She describes the headache as a constant pressure, predominantly in the frontal and temporal regions. No known history of migraines. Over-the-counter pain relievers provide minimal relief. No recent head trauma. Denies fever, vision changes, or weakness.
+[NAME#4] presents with complaints of severe, persistent headaches accompanied by dizziness and occasional nausea. Symptoms began gradually and have been worsening over the past two weeks. She describes the headache as a constant pressure, predominantly in the frontal and temporal regions. No known history of migraines. Over-the-counter pain relievers provide minimal relief. No recent head trauma. Denies fever, vision changes, or weakness.
 
 Past Medical History (PMH):
 
-Hypertension (diagnosed *date*)
+Hypertension (diagnosed 2019)
 
-Anxiety disorder (diagnosed *date*)
+Anxiety disorder (diagnosed 2021)
 
 No known surgical history
 
@@ -49,11 +49,7 @@ Acetaminophen 500 mg as needed for pain
 
 Allergies:
 
-Penicillin
-
-NSAIDs (e.g., ibuprofen, naproxen)
-
-Latex
+[ALLERGY#1]
 
 Family History:
 
@@ -61,7 +57,7 @@ Mother: Hypertension, migraines
 
 Father: Type 2 diabetes, stroke
 
-Biometric: *biometric*
+Biometric: [BIOMETRIC#1]
 
 Social History:
 
@@ -131,21 +127,17 @@ Referred to neurology for further evaluation.
 
 Patient education provided on lifestyle modifications to manage headaches and hypertension.
 
-Lab Results (*date*):
+Lab Results ([DATE#2]):
 
-CBC: Normal
-
-Electrolytes: Normal
-
-MRI Brain: No acute abnormalities detected
+[LAB_RESULTS#1]
 
 Follow-up Appointments:
 
-Scheduled for *date* with neurology.
+Scheduled for [DATE#3] with neurology.
 
-Additional follow-up scheduled for *date* to reassess headache frequency and medication effectiveness.
+Additional follow-up scheduled for [DATE#4] to reassess headache frequency and medication effectiveness.
 
-Blood pressure check-in scheduled for *date* to monitor response to adjusted lisinopril dosage.
+Blood pressure check-in scheduled for [DATE#5] to monitor response to adjusted lisinopril dosage.
 
 Provider Notes:
 
@@ -159,7 +151,7 @@ Encouraged patient to identify possible dietary triggers for headaches and maint
 
 Instructed patient to report any worsening symptoms, changes in headache pattern, or development of neurological deficits immediately.
 
-*date* (Neurology Follow-up):
+[DATE#6] (Neurology Follow-up):
 
 Patient reports mild improvement in symptoms.
 
@@ -171,7 +163,7 @@ Initiated amitriptyline 10 mg nightly for headache prevention.
 
 Advised continued monitoring and follow-up in 6 weeks.
 
-*date* (Blood Pressure Follow-up):
+[DATE#7] (Blood Pressure Follow-up):
 
 Patient reports consistent use of lisinopril 20 mg daily.
 
@@ -181,7 +173,7 @@ Encouraged patient to maintain low-sodium diet and monitor at-home readings.
 
 Next follow-up scheduled in one month.
 
-*date* (Headache and Medication Follow-up):
+[DATE#8] (Headache and Medication Follow-up):
 
 Patient reports further reduction in headache frequency and severity.
 

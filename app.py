@@ -16,6 +16,9 @@ from google import genai
 from google.genai import types
 import yaml
 import ast
+import copy
+from cryptography.fernet import Fernet
+import base64
 
 load_dotenv()
 client = genai.Client()
@@ -30,14 +33,18 @@ phi_list = ["Doc Name", "Patient Name", "All Names", "Social Worker Names", "Dat
 
 phi_dict = {}
 
-phi_dict["PHI 3"] = ["All Names", "All Dates", "Phone Number", "Fax Number", "Address", "Email", "SSN", "Medical Record Number", "Health Plan Beneficiary Number", "All Account Numbers", "Certificate/License Number", "Serial Number", "Device Identifier", "URL", "IP Address", "Biometric Identifier", "Unique ID or Code"]
+phi_dict["All PHI"] = phi_list
 
-phi_dict["PHI 2"] = ["Patient Name", "Doc Name", "Date of Birth", "SSN", "Address", "Email", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medicaid Account", "Social Worker Names", "Phone Number"]
+phi_dict["PHI List 3"] = ["All Names", "All Dates", "Phone Number", "Fax Number", "Address", "Email", "SSN", "Medical Record Number", "Health Plan Beneficiary Number", "All Account Numbers", "Certificate/License Number", "Serial Number", "Device Identifier", "URL", "IP Address", "Biometric Identifier", "Unique ID or Code"]
+
+phi_dict["PHI List 2"] = ["Patient Name", "Doc Name", "Date of Birth", "SSN", "Address", "Email", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medicaid Account", "Social Worker Names", "Phone Number"]
+
+
 
 with open("prompts.yaml", "r") as prompt_file:
    phi_prompts = yaml.safe_load(prompt_file)
 
-print(phi_prompts)
+# print(phi_prompts)
 
 phi = None
 
@@ -66,29 +73,40 @@ if 'reid_map' not in st.session_state:
 if 'file' not in st.session_state:
    st.session_state.file = None
 
+if 'customcode' not in st.session_state:
+   st.session_state.customcode = None
+
+if 'encrypted_map' not in st.session_state:
+   st.session_state.encrypted_map = None
+
 st.header("Health Data Deidentifier")
 
-if st.session_state.state <= 2:
-   if st.sidebar.button("Reidentify Record", type="primary"):
+if st.session_state.state <= 2 or st.session_state.state > 4:
+   if st.sidebar.button("Reidentification Mode", type="primary"):
       st.session_state.state = 3
       st.session_state.input = ""
       st.session_state.output = ""
       st.session_state.reid_map = None
       st.session_state.file = None
+      st.session_state.customcode = None
+      st.session_state.encrypted_map = None
+
       st.rerun()
    method = st.sidebar.radio("Method", ["LLM", "RegEx"])
    if method == "RegEx":
-      phi_no = st.sidebar.radio("PHI List", ["PHI 1", "PHI 3"])
+      phi_no = st.sidebar.radio("PHI List", ["PHI 1", "PHI 3"], index=0)
    elif method == "LLM":
-      phi_no = st.sidebar.radio("PHI List", ["PHI 2", "PHI 3"])
-      phi = st.sidebar.multiselect("PHI Items", phi_list, default=phi_dict[phi_no])
+      phi_no = st.sidebar.radio("PHI List", phi_dict.keys(), index=0)
+      phi = st.sidebar.multiselect("Select PHI Items to Remove", phi_list, default=phi_dict[phi_no])
 else:
-   if st.sidebar.button("Deidentify Record", type="primary"):
+   if st.sidebar.button("Deidentification Mode", type="primary"):
       st.session_state.state = 0
       st.session_state.input = ""
       st.session_state.output = ""
       st.session_state.reid_map = None
       st.session_state.file = None
+      st.session_state.customcode = None
+      st.session_state.encrypted_map = None
       st.rerun()
 
 def reidentify(ehr_text, reid_map):
@@ -143,7 +161,7 @@ def deidentify():
             st.session_state.output = "\n".join(lines)
 
          elif(phi_no=="PHI 3"):
-
+            
             deidentified_ehr, id_map = deidentify_ehr_iterative_selective(txt)
             print(deidentified_ehr, id_map)
 
@@ -160,13 +178,19 @@ def deidentify():
          prompt = """
                   Task: Please anonymize the following clinical note using these instructions:
 
+                  DO NOT ADD OR REMOVE ANY SPACES OR NEWLINE CHARACTERS FROM THE ORIGINAL TEXT.
+
                   """ + "\n".join(remove_items) + """
 
-                  An example: The string "Dr. Alex can be called at 654-123-7777" should become "*name* can be called at *phone*"
+                  REMOVE INFORMATION WITHOUT ADDING OR REMOVING ANY SPACES OR NEWLINE CHARACTERS.
 
-                  You should only replace personal information and not generic words. For example, if the word 'Name' or 'Phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. ONLY replace words that contain actual personal information
-                  
-                  If the word for the information itself is in the record, like the word "Phone", do not replace it with *phone*. Only the actual personal information should be replaced.
+                  For Example: The string 
+                  "Dr. Alex can be called at his phone number:654-123-7777"
+                  should become
+                  "*name* can be called at his phone number:*phone*"
+
+                  You should only replace personal information and not generic words. For example, if the word 'Name' or 'Phone' appears in the health record, it should NOT be replaced with '*name*' or '*phone*'. ONLY replace words that contain actual personal information.
+
                   THE OUTPUT SHOULD INCLUDE ONLY THE ANONYMIZED HEALTH RECORD WITH NO OTHER TEXT.
 
                   Health Record:
@@ -176,17 +200,31 @@ def deidentify():
          #print(prompt)
 
          response = client.models.generate_content(
-            model = "gemini-1.5-flash",
+            model = "gemini-2.0-flash",
             config=types.GenerateContentConfig(
-               temperature=0
+               temperature=0.0
             ),
             contents=[prompt]
          )
          #print(response)
-         st.session_state.output = response.text
+         deid_txt = response.text
+
+         deid_ehr, id_map = create_reid_map(txt, deid_txt)
+
+         st.session_state.output = deid_ehr
+         st.session_state.reid_map = str(id_map)
 
 
       st.session_state.state = 2
+
+def encrypt():
+   fernet = Fernet(st.session_state.customcode.encode())
+   st.session_state.encrypted_map = fernet.encrypt(st.session_state.reid_map.encode())
+
+def decrypt(code):
+   fernet = Fernet(code.encode())
+   decoded_map = fernet.decrypt(st.session_state.encrypted_map).decode()
+   st.session_state.reid_map = ast.literal_eval(decoded_map)
 
 if st.session_state.state < 2:
    if st.session_state.file == None:
@@ -202,9 +240,10 @@ if st.session_state.state < 2:
       st.session_state.input = stringio.read()
       st.write("")
       st.markdown(f"### Your Input Record - {st.session_state.file.name}")
-      st.text(st.session_state.input)
-      st.write("")
       state = st.button("Deidentify Record", on_click = deidentify)
+      st.write("")
+      st.text(st.session_state.input)
+      
 elif st.session_state.state == 2:
 
    # PLEASE PUT CODE FOR REIDENTIFICATION HERE
@@ -221,34 +260,71 @@ elif st.session_state.state == 2:
    download_name = os.path.splitext(st.session_state.file.name)[0] + "-deidentified.txt"
    st.download_button(label="Download Deidentified Record", data=st.session_state.output, file_name=download_name, mime="text/plain")
 
-   reid_download_name = os.path.splitext(st.session_state.file.name)[0] + "-reid_map.txt"
    if(st.session_state.reid_map is not None):
-      st.download_button(label="Download Reidentification Map", data=st.session_state.reid_map, file_name=reid_download_name, mime="text/plain")
+      if(st.button("Get Reidentification Map")):
+         st.session_state.state = 5
+         st.rerun()
    st.text(st.session_state.output)
    
 elif st.session_state.state == 3:
    st.subheader("Reidentification Mode")
    st.session_state.file = st.file_uploader(label = "Upload DEIDENTIFIED record here.", type=['txt', 'md'])
 
-   st.session_state.reid_map = st.file_uploader(label = "Upload REIDENTIFICATION map here.", type=['txt', 'md'])
-   
-   if st.session_state.file is not None and st.session_state.reid_map is not None:
-      if st.button("Reidentify Record"):
+   st.session_state.reid_map = st.file_uploader(label = "Upload REIDENTIFICATION map here.", type=['map'])
+
+   st.write("")
+   st.write("")
+
+   st.markdown("##### Please enter the passcode for the reidentification map:")
+   input_password = st.text_input(label="", key="customcode", type="password")
+
+   if input_password and st.session_state.file is not None and st.session_state.reid_map is not None:
+      if st.button("Reidentify Record", key="reidentify-enter"):
+         # try:
 
          data = st.session_state.file.getvalue()
          stringio = StringIO(data.decode())
          st.session_state.input = stringio.read()
 
-         reid_data = st.session_state.reid_map.getvalue()
-         stringio = StringIO(reid_data.decode())
-         st.session_state.reid_map = ast.literal_eval(stringio.read())
+         st.session_state.encrypted_map = st.session_state.reid_map.getvalue()
+         # stringio = StringIO(reid_data.decode())
+         # st.session_state.encrypted_map = ast.literal_eval(stringio.read())
+
+         decrypt(input_password)
+
+         
          
          
          #data is a string, reid_data is a python dictionary
          st.session_state.output = reidentify(st.session_state.input, st.session_state.reid_map)
 
+         # except:
+         #    st.markdown("## Reidentification Failed. Your passcode may be incorrect.")
+         
+         # else:
          st.session_state.state = 4
          st.rerun()
+
+
+   
+   # if st.session_state.file is not None and st.session_state.reid_map is not None:
+   #    if st.button("Reidentify Record"):
+
+   #       data = st.session_state.file.getvalue()
+   #       stringio = StringIO(data.decode())
+   #       st.session_state.input = stringio.read()
+
+   #       reid_data = st.session_state.reid_map.getvalue()
+   #       stringio = StringIO(reid_data.decode())
+   #       st.session_state.reid_map = ast.literal_eval(stringio.read())
+         
+         
+   #       #data is a string, reid_data is a python dictionary
+   #       st.session_state.output = reidentify(st.session_state.input, st.session_state.reid_map)
+
+   #       st.session_state.state = 4
+   #       st.rerun()
+
 elif st.session_state.state == 4:
    st.markdown("""### Record Reidentified!""")
    download_name = os.path.splitext(st.session_state.file.name)[0] + "-reidentified.txt"
@@ -256,6 +332,128 @@ elif st.session_state.state == 4:
    #st.text(st.session_state.input)
    #st.text(str(st.session_state.reid_map))
    st.text(st.session_state.output)
+elif st.session_state.state == 5:
+   st.markdown("### Get Reidentification Map")
+   st.markdown("**To download the reidentification map, please generate a passcode for encryption. You must *use* this passcode later to reidentify the record. Store it in a safe place.**")
+
+   if "pass_vis" not in st.session_state:
+      st.session_state.pass_vis = False
+
+   show_pass = "default" if st.session_state.pass_vis else "password"
+
+   if "gencode" not in st.session_state:
+      st.session_state.gencode = None
+
+   if st.button("Generate Random Passcode"):
+      key = Fernet.generate_key()
+      st.session_state.customcode = key.decode()
+      encrypt()
+      print(type(key))
+      st.rerun()
+   st.write("Generating a passcode will reset any passcode you have entered below")
+
+   st.text_input(label="Your Passcode", type=show_pass, key="customcode", on_change=encrypt, disabled= True)
+
+   # st.checkbox(label = "Show Passcode", key="pass_vis", value=False)
+   st.write()
+
+   if st.session_state.encrypted_map:
+      reid_download_name = os.path.splitext(st.session_state.file.name)[0] + "-reid_encrypted.map"
+
+      st.download_button(label="Download Reidentification Map", data=st.session_state.encrypted_map, file_name=reid_download_name, mime="text/plain")
+
+
+def generate_passcode():
+   key = Fernet.generate_key()
+
+
+
+phi_counts = dict()
+# reid_dict = 
+
+deid_tags = ["name", "dob", "date", "phone", "fax", "address", "email", "ssn", "medicaid", "record_no", "health_plan_no", "account_no", "license", "serial", "device", "url", "ip_address", "biometric", "id", "provider", "hospital", "allergies", "lab_results"]
+
+deid_counts = [1 for tag in deid_tags]
+
+deid_dict_default = dict(zip(deid_tags, deid_counts))
+
+def create_reid_map(txt, deid_txt):
+   
+   txt = txt.replace("\r\n", "\n").rstrip()
+   deid_txt = deid_txt.rstrip()
+   # print(repr(txt))
+   # print(repr(deid_txt))
+
+   deid_count_dict = copy.deepcopy(deid_dict_default)
+   reid_dict = dict()
+
+   new_txt = copy.deepcopy(deid_txt)
+
+   textsearch = dict()
+
+   txt_list = []
+   txt_list.append(new_txt)
+
+   for item in deid_count_dict:
+      lookfor = "*" + item + "*"
+      empty = []
+      for substring in txt_list:
+         empty += substring.split(lookfor)
+      txt_list = empty
+   
+   print(txt_list)
+   print()
+   print(repr(txt))
+   print()
+   print(repr(deid_txt))
+
+   current_start = 0
+   deid_iter = 0
+
+   output = ""
+
+   for i in range(len(txt_list)-1):
+      start = txt[current_start:].find(txt_list[i]) + len(txt_list[i]) + current_start
+      end = txt[start:].find(txt_list[i+1]) + start
+      current_start = end
+      # if end == -1:
+      #    end = None
+      name = txt[start:end]
+
+      deid_start = deid_txt[deid_iter:].find(txt_list[i]) + len(txt_list[i]) + deid_iter
+      deid_end = deid_txt[deid_start:].find(txt_list[i+1]) + deid_start
+      deid_iter = deid_end
+      # if deid_end == -1:
+      #    deid_end = None
+      deid_type = deid_txt[deid_start+1:deid_end-1]   
+
+      # print(name, deid_type)
+
+      replacement = deid_type.upper()+"#"+str(deid_count_dict[deid_type])
+      print(name, deid_type, replacement)
+      deid_count_dict[deid_type] += 1
+      output += txt_list[i]
+      
+      output += "[" + replacement + "]"
+      reid_dict[replacement] = name
+
+      
+
+   print(str(reid_dict))
+   output += txt_list[-1]
+   
+   # print(output)
+   # print(str(reid_dict))
+   return output, reid_dict
+      #start = deid_txt.find(txt_list[i])
+
+
+
+
+
+
+
+
 
 
 # Replaces matches of a pattern with unique identifiers iteratively, keeping category names and counts.
@@ -296,15 +494,15 @@ def deidentify_ehr_iterative_selective(text):
         (r"(Patient name:|Provider name:|Patient:|Provider:|Patient Name:|Provider Name:)\s*((?:" + re_matcher + r"\.\s*)?[A-Z][a-z]+(?:[ ][A-Z][a-z]+)*)", "NAME"),
         (r"()(" + re_matcher + r"\.\s*[A-Z][a-z]+(?:[ ][A-Z][a-z]+)*)", "NAME"),
         (r"(Address:)\s*((?:[^,\n]+?)(?:,\s*Apt\s*(?:[^\n,]+?))?(?:,\s*)(?:[^,\n]+?,\s*)?(?:[A-Z]{2})\s*(?:\d{5}(?:-\d{4})?))", "ADDRESS"),
-        (r"(Date of Birth:|DoB:|DOB:)\s*(\d{2}/\d{2}/\d{4})", "DATE"),
-        (r"()\s*(\d{2}/\d{2}/\d{4})", "DATE"),
+        (r"(Date of Birth:|DoB:|DOB:)\s*(\d{2}/\d{2}/\d{4})", "DOB"),
         (r"(SSN:)\s*([0-9*]{3}-[0-9*]{2}-[0-9*]{4})", "SSN"), # Capture the word boundary and SSN
         (r"(Phone:)\s*(\d{3}-\d{3}-\d{4})", "PHONE"),
         (r"(email:|Email:)\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})", "EMAIL"),
         (r"(Medicaid account:|Account:)\s*(\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b)", "ACCOUNT"),
         (r"(Hospital name:|Hospital Name:)\s*(\w+(?: \w+)+)", "HOSPITAL"),
-        (r"(Lab Results(?:\s*\((?:\d{2}/\d{2}/\d{4})\))?:)((?:\n-\s.+)+)", "LAB"),
+        (r"(Lab Results\s*(?:\((?:[0-1]?[0-9]/[0-3]?[0-9]/\d{4})\))?:)\s*((?:\n-\s*.+)+)", "LAB"),
         (r"(Allergies:)((?:\n-?\s(?![\w ]+:).+)+)", "ALLERGIES"),
+        (r"(Lab Results\s*(?:\((?:[0-1]?[0-9]/[0-3]?[0-9]/\d{4})\))?:)((?:\n-?\s(?!Follow+).+)+)", "LAB"),
         (r"(Health plan beneficiary number:)\s*(\d{3}-\d{4}-\d{4})", "NUMBER"),
         (r"(Device identifier:)\s*([A-Za-z0-9]{6}-[A-Za-z0-9]{8})", "NUMBER"),
         (r"(Pacemaker serial numbers:)\s*([A-Za-z0-9]{5}-[A-Za-z0-9]{7})", "NUMBER"),
@@ -328,10 +526,15 @@ def deidentify_ehr_iterative_selective(text):
 
     return updated_text, de_id_map
 
+def reidentify_ehr(text, id_map):
+    # This regex matches [TYPE#123] format
+    pattern = re.compile(r"\[(\w+#\d+)\]")
 
-with(open("ehr EC 3.txt") as phi2):
-    ehr_text = ''.join(list(phi2.readlines()))
+    def replace(match):
+        # drop the brackets
+        # try to replace this token using the id_map
+        # if it’s not in the map, just leave the token as is
+        key = match.group(1)
+        return id_map.get(key, match.group(0))
 
-    # Apply the selective iterative de-identification function
-    deidentified_ehr, id_map = deidentify_ehr_iterative_selective(ehr_text)
-   #  print(deidentified_ehr, id_map)
+    return pattern.sub(replace, text)
