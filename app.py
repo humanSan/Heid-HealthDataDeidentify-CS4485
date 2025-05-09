@@ -392,7 +392,7 @@ elif st.session_state.state == 4:
    st.text(st.session_state.output)
 elif st.session_state.state == 5:
    st.subheader("📑 Get Reidentification Map")
-   st.markdown("**To download the reidentification map, please generate a passcode for encryption. You must *use* this passcode later to reidentify the record. Store it in a safe place.**")
+   st.markdown("**To download the reidentification map, please enter or generate a passcode for encryption. You must *use* this passcode later to reidentify the record. Store it in a safe place.**")
 
    if "pass_vis" not in st.session_state:
       st.session_state.pass_vis = False
@@ -408,14 +408,14 @@ elif st.session_state.state == 5:
       encrypt()
       print(type(key))
       st.rerun()
-   st.write("Generating a passcode will reset any passcode you have entered below")
+   st.write("Generating a random passcode will reset any passcode you have entered below.")
 
    st.text_input(label="Your Passcode", type=show_pass, key="customcode", on_change=encrypt)
 
    # st.checkbox(label = "Show Passcode", key="pass_vis", value=False)
    st.write()
 
-   if st.session_state.encrypted_map:
+   if st.session_state.encrypted_map and st.session_state.customcode is not None:
       reid_download_name = os.path.splitext(st.session_state.file.name)[0] + "-reid_encrypted.map"
 
       st.download_button(label="Confirm Passcode and Download Map", icon=":material/encrypted:", data=st.session_state.encrypted_map, file_name=reid_download_name, mime="text/plain")
