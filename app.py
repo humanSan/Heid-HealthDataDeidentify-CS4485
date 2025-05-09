@@ -44,6 +44,8 @@ phi_dict["PHI List 3"] = ["All Names", "All Dates", "Phone Number", "Fax Number"
 
 phi_dict["PHI List 2"] = ["Patient Name", "Doc Name", "Date of Birth", "SSN", "Address", "Email", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medicaid Account", "Social Worker Names", "Phone Number"]
 
+phi_dict["PHI List 1"] = ["All Names", "Address", "Date of Birth", "SSN", "Phone Number", "Email"]
+
 regex_match_dict = {
         "Name" : "NAME_MATCHERS",
         "Address" : "ADDRESS_MATCHERS",
@@ -63,6 +65,7 @@ regex_match_dict = {
 regex_phi_dict = {}
 regex_phi_dict["All PHI"] = list(regex_match_dict.keys())
 regex_phi_dict["PHI List 3"] = ["Name", "Address", "Dates", "Phone", "SSN", "Email", "Account Numbers", "ID", "Serial Numbers", "URLs"]
+regex_phi_dict["PHI List 1"] = ["Name", "Address", "Date of Birth", "Phone", "SSN", "Email"]
 
 with open("prompts.yaml", "r") as prompt_file:
    phi_prompts = yaml.safe_load(prompt_file)
@@ -185,7 +188,7 @@ def deidentify(include_type = True):
          if(phi_no=="PHI 1"):
             # substitute emails using regex
 
-            print(txt)
+            # print(txt)
             txt = strip_emails(txt)
             txt = strip_phone_nums(txt)
             txt = strip_names(txt)
@@ -263,6 +266,8 @@ def deidentify(include_type = True):
          )
          #print(response)
          deid_txt = response.text
+
+         # print(deid_txt)
 
          deid_ehr, id_map = create_reid_map(txt, deid_txt, st.session_state.include_type)
 
