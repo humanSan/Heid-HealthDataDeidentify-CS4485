@@ -118,6 +118,7 @@ def goDeid():
    st.session_state.customcode = None
    st.session_state.encrypted_map = None
    st.session_state.method = "LLM"
+   st.session_state.phi_no = "All PHI"
    st.rerun()
 
 def goReid():
@@ -140,11 +141,11 @@ if st.session_state.state <= 2 or st.session_state.state > 4:
       
    st.sidebar.radio("Method", ["LLM", "RegEx"], key = "method")
    if st.session_state.method == "RegEx":
-      phi_no = st.sidebar.radio("PHI List", regex_phi_dict.keys(), index=0)
+      phi_no = st.sidebar.radio("PHI List", regex_phi_dict.keys(), key="phi_no")
       # phi_no = "Else"
       phi = st.sidebar.multiselect("Select PHI Items to Remove", list(regex_match_dict.keys()), default=regex_phi_dict[phi_no])
    elif st.session_state.method == "LLM":
-      phi_no = st.sidebar.radio("PHI List", phi_dict.keys(), index=0)
+      phi_no = st.sidebar.radio("PHI List", phi_dict.keys(), key = "phi_no")
       phi = st.sidebar.multiselect("Select PHI Items to Remove", phi_list, default=phi_dict[phi_no])
 else:
    if st.sidebar.button("Deidentiy", icon=":material/shuffle:", type="secondary"):
@@ -238,7 +239,7 @@ def deidentify(include_type = True):
 
                   DO NOT ADD OR REMOVE ANY SPACES OR NEWLINE CHARACTERS FROM THE ORIGINAL TEXT.
 
-                  """ + "\n".join(remove_items) + """
+                  """ + "\n\n".join(remove_items) + """
 
                   REMOVE INFORMATION WITHOUT ADDING OR REMOVING ANY SPACES OR NEWLINE CHARACTERS.
 
@@ -479,7 +480,7 @@ def generate_passcode():
 phi_counts = dict()
 # reid_dict = 
 
-deid_tags = ["name", "dob", "date", "phone", "fax", "address", "email", "ssn", "medicaid", "record_no", "health_plan_no", "account_no", "license", "serial", "device", "url", "ip_address", "biometric", "id", "provider", "hospital", "allergies", "lab_results", "medication"]
+deid_tags = ["name", "date", "phone", "fax", "address", "email", "ssn", "medicaid", "record_no", "health_plan_no", "account_no", "license", "serial", "device", "url", "ip_address", "biometric", "id", "provider", "hospital", "allergies", "lab_results", "medication"]
 
 deid_counts = [1 for tag in deid_tags]
 

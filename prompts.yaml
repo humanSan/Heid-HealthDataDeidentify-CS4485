@@ -2,7 +2,7 @@ Doc Name: Replace the names and acronyms, initials, and honorifics like Ms, Mr, 
 Patient Name: Replace the names and acronyms, initials, and honorifics like Ms, Mr of patient names with the string '*name*'
 All Names: Replace any names of people (also remove any attached honorifics, initials, or acronyms) with the string '*name*'. If there are acronyms related to degrees or certifications like MD, RA, PA near the name, remove it with the name.
 Social Worker Names: Replace any names of social workers or health workers with the string '*name*'
-Date of Birth: Replace any dates of birth with the string '*dob*'
+Date of Birth: Replace any dates of birth with the string '*date*'
 All Dates: Replace any dates (including months or years) with the string '*date*'
 Phone Number: Replace each phone number with the string '*phone*'
 Fax Number: Replace each fax number with the string '*fax*'
@@ -19,9 +19,9 @@ Device Identifier: Replace any device identifiers with '*device*'
 URL: Replace any Universal Resource Locators (URL) with '*url*'
 IP Address: Replace any IP address numbers with '*ip_address*'
 Biometric Identifier: Replace any information related to biometrics with '*biometric*'
-Unique ID or Code: Replace any unique identifying numbers, characteristics, or codes with '*id*. If the id has multiple components that are separated by characters like -, /, _, remove all components and separaters too.'
+Unique ID or Code: Replace any unique IDs, group numbers, or codes with '*id*. If the id has multiple components that are separated by characters like -, /, _, remove all components and separaters too.'
 Provider Name: Replace each provider name with the string '*provider*'
 Hospital Name: Replace clinic and hospital names with the string '*hospital*'
-Allergies: Replace all allergies with the string '*allergies*'.
-Lab Results: Replace all lab results and the type of the lab result in the lab results section with the string '*lab_results*'
-Medication: Replace all names of medications and drugs, along with any dosage information with the string '*medication*'
+Allergies: Replace all allergies with the string '*allergies*'. Replace "asthma" and "seasonal allergies". If there is a header like "Allergies:" denoting a allergies section, keep the header.
+Lab Results: Replace each name of lab tests and the lab results (replace them together) only if they are in the section marked as Lab Results with the string '*lab_results*'. Do not replace lab results in other sections.
+Medication: Replace all names of medications and drugs, along with any dosage or frequency information with the string '*medication*'
