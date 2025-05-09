@@ -44,7 +44,25 @@ phi_dict["PHI List 3"] = ["All Names", "All Dates", "Phone Number", "Fax Number"
 
 phi_dict["PHI List 2"] = ["Patient Name", "Doc Name", "Date of Birth", "SSN", "Address", "Email", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medicaid Account", "Social Worker Names", "Phone Number"]
 
+regex_match_dict = {
+        "Name" : "NAME_MATCHERS",
+        "Address" : "ADDRESS_MATCHERS",
+        "Date of Birth": "DOB_MATCHERS",
+        "Dates" : "DATE_MATCHERS",
+        "SSN" : "SSN_MATCHERS",
+        "Phone" : "PHONE_MATCHERS",
+        "Email" : "EMAIL_MATCHERS",
+        "Account Numbers" : "ACCOUNT_MATCHERS",
+        "Lab Results" : "LAB_MATCHERS",
+        "Allergies" : "ALLERGIES_MATCHERS",
+        "ID" : "ID_MATCHERS",
+        "Serial Numbers" : "SERIAL_MATCHERS",
+        "URLs" : "URL_MATCHERS"
+}
 
+regex_phi_dict = {}
+regex_phi_dict["All PHI"] = list(regex_match_dict.keys())
+regex_phi_dict["PHI List 3"] = ["Name", "Address", "Dates", "Phone", "SSN", "Email", "Account Numbers", "ID", "Serial Numbers", "URLs"]
 
 with open("prompts.yaml", "r") as prompt_file:
    phi_prompts = yaml.safe_load(prompt_file)
@@ -52,7 +70,6 @@ with open("prompts.yaml", "r") as prompt_file:
 # print(phi_prompts)
 
 phi = None
-
 
 
 
@@ -84,6 +101,9 @@ if 'customcode' not in st.session_state:
 if 'encrypted_map' not in st.session_state:
    st.session_state.encrypted_map = None
 
+if 'include_type' not in st.session_state:
+   st.session_state.include_type = None
+
 st.header("🧬 Health Data Deidentifier")
 
 def goDeid():
@@ -94,6 +114,7 @@ def goDeid():
    st.session_state.file = None
    st.session_state.customcode = None
    st.session_state.encrypted_map = None
+   st.session_state.method = "LLM"
    st.rerun()
 
 def goReid():
@@ -114,10 +135,12 @@ if st.session_state.state <= 2 or st.session_state.state > 4:
    if st.sidebar.button("Reidentify", icon=":material/fingerprint:", type="secondary"):
       goReid()
       
-   method = st.sidebar.radio("Method", ["LLM", "RegEx"])
-   if method == "RegEx":
-      phi_no = st.sidebar.radio("PHI List", ["PHI 1", "PHI 3"], index=0)
-   elif method == "LLM":
+   st.sidebar.radio("Method", ["LLM", "RegEx"], key = "method")
+   if st.session_state.method == "RegEx":
+      phi_no = st.sidebar.radio("PHI List", regex_phi_dict.keys(), index=0)
+      # phi_no = "Else"
+      phi = st.sidebar.multiselect("Select PHI Items to Remove", list(regex_match_dict.keys()), default=regex_phi_dict[phi_no])
+   elif st.session_state.method == "LLM":
       phi_no = st.sidebar.radio("PHI List", phi_dict.keys(), index=0)
       phi = st.sidebar.multiselect("Select PHI Items to Remove", phi_list, default=phi_dict[phi_no])
 else:
@@ -140,10 +163,12 @@ def reidentify(ehr_text, reid_map):
    
    return text
 
-def deidentify():
+def deidentify(include_type = True):
    phiList = []
    with(open("phi2.txt") as phi2):
       phiList = phi2.readlines()
+
+   method = st.session_state.method
    
    # substitute dates using regex
    # covers dates in the form 03/07/2025, 3-7-25, etc.
@@ -154,6 +179,9 @@ def deidentify():
       
 
       if(method=="RegEx"):
+         
+         regex_phi_list = [regex_match_dict[i] for i in phi]
+
          if(phi_no=="PHI 1"):
             # substitute emails using regex
 
@@ -182,6 +210,14 @@ def deidentify():
          elif(phi_no=="PHI 3"):
             
             deidentified_ehr, id_map = deidentify_ehr_iterative_selective(txt)
+            print(deidentified_ehr, id_map)
+
+            st.session_state.output = deidentified_ehr
+            st.session_state.reid_map = str(id_map)
+         
+         else:
+            print(repr(txt))
+            deidentified_ehr, id_map = regex_deidentify(txt, regex_phi_list)
             print(deidentified_ehr, id_map)
 
             st.session_state.output = deidentified_ehr
@@ -228,7 +264,7 @@ def deidentify():
          #print(response)
          deid_txt = response.text
 
-         deid_ehr, id_map = create_reid_map(txt, deid_txt)
+         deid_ehr, id_map = create_reid_map(txt, deid_txt, st.session_state.include_type)
 
          st.session_state.output = deid_ehr
          st.session_state.reid_map = str(id_map)
@@ -297,9 +333,13 @@ if st.session_state.state < 2:
       stringio = StringIO(data.decode())
       st.session_state.input = stringio.read()
       st.write("")
-      st.subheader(f"Your Input Record - {st.session_state.file.name}")
-      state = st.button("Deidentify Record", icon=":material/start:", on_click = deidentify)
+      st.subheader(f"Your Input Record - {st.session_state.file.name}")     
       st.write("")
+      state = st.button("Deidentify Record", icon=":material/start:", on_click = deidentify)
+
+      if st.session_state.method == "LLM":
+         st.session_state.include_type = st.checkbox(label="**Include Info Types in Deidentified Record**", value = True) 
+      st.divider()
       st.text(st.session_state.input)
       
 elif st.session_state.state == 2:
@@ -322,6 +362,7 @@ elif st.session_state.state == 2:
       if(st.button("Get Reidentification Map", icon=":material/key:")):
          st.session_state.state = 5
          st.rerun()
+   st.divider()
    st.text(st.session_state.output)
    
 elif st.session_state.state == 3:
@@ -389,6 +430,7 @@ elif st.session_state.state == 4:
    st.download_button(label="Download Reidentified Record", icon=":material/download:", data=st.session_state.output, file_name=download_name, mime="text/plain")
    #st.text(st.session_state.input)
    #st.text(str(st.session_state.reid_map))
+   st.divider()
    st.text(st.session_state.output)
 elif st.session_state.state == 5:
    st.subheader("📑 Get Reidentification Map")
@@ -415,7 +457,7 @@ elif st.session_state.state == 5:
    # st.checkbox(label = "Show Passcode", key="pass_vis", value=False)
    st.write()
 
-   if st.session_state.encrypted_map and st.session_state.customcode is not None:
+   if st.session_state.encrypted_map and st.session_state.customcode is not None and st.session_state.customcode.strip() is not "": #TODO
       reid_download_name = os.path.splitext(st.session_state.file.name)[0] + "-reid_encrypted.map"
 
       st.download_button(label="Confirm Passcode and Download Map", icon=":material/encrypted:", data=st.session_state.encrypted_map, file_name=reid_download_name, mime="text/plain")
@@ -438,7 +480,7 @@ deid_counts = [1 for tag in deid_tags]
 
 deid_dict_default = dict(zip(deid_tags, deid_counts))
 
-def create_reid_map(txt, deid_txt):
+def create_reid_map(txt, deid_txt, include_type = True):
    
    txt = txt.replace("\r\n", "\n").rstrip()
    deid_txt = deid_txt.rstrip()
@@ -461,15 +503,11 @@ def create_reid_map(txt, deid_txt):
       for substring in txt_list:
          empty += substring.split(lookfor)
       txt_list = empty
-   
-   print(txt_list)
-   print()
-   print(repr(txt))
-   print()
-   print(repr(deid_txt))
 
    current_start = 0
    deid_iter = 0
+
+   counter = 1
 
    output = ""
 
@@ -490,9 +528,10 @@ def create_reid_map(txt, deid_txt):
 
       # print(name, deid_type)
 
-      replacement = deid_type.upper()+"#"+str(deid_count_dict[deid_type])
-      print(name, deid_type, replacement)
+      replacement = deid_type.upper()+"#"+str(deid_count_dict[deid_type]) if include_type else "REMOVED#"+str(counter)
+      # print(name, deid_type, replacement)
       deid_count_dict[deid_type] += 1
+      counter += 1
       output += txt_list[i]
       
       output += "[" + replacement + "]"
@@ -500,7 +539,7 @@ def create_reid_map(txt, deid_txt):
 
       
 
-   print(str(reid_dict))
+   # print(str(reid_dict))
    output += txt_list[-1]
    
    # print(output)
@@ -538,6 +577,7 @@ def replace_with_unique_identifier_iterative_selective(text, pattern, prefix, re
 
     return re.sub(pattern, replace, text), replaced_count
 
+
 with open("matchers/honorifics.txt", "r") as file:
     re_matcher = ""
     for line in file:
@@ -545,37 +585,75 @@ with open("matchers/honorifics.txt", "r") as file:
     # remove the leading pipe |
     re_matcher = "(?:" + re_matcher[1:] + ")"
 
-# De-identifies EHR text by iteratively replacing only the sensitive information to keep track of what was replaced.
-def deidentify_ehr_iterative_selective(text):
-    replaced_counts = {}
-    de_id_map = {}
-    updated_text = text
-
-    patterns = [
-        (r"(Patient name:|Provider name:|Patient:|Provider:|Patient Name:|Provider Name:)\s*((?:" + re_matcher + r"\.\s*)?[A-Z][a-z]+(?:[ ][A-Z][a-z]+)*)", "NAME"),
+MATCHER_MAP = {
+    "NAME_MATCHERS": [
+        (
+            r"(Patient name:|Provider name:|Patient:|Provider:|Patient Name:|Provider Name:)\s*((?:" + re_matcher + r"\.\s*)?[A-Z][a-z]+(?:[ ][A-Z][a-z]+)*)",
+            "NAME"),
         (r"()(" + re_matcher + r"\.\s*[A-Z][a-z]+(?:[ ][A-Z][a-z]+)*)", "NAME"),
-        (r"(Address:)\s*((?:[^,\n]+?)(?:,\s*Apt\s*(?:[^\n,]+?))?(?:,\s*)(?:[^,\n]+?,\s*)?(?:[A-Z]{2})\s*(?:\d{5}(?:-\d{4})?))", "ADDRESS"),
-        (r"(Date of Birth:|DoB:|DOB:)\s*(\d{2}/\d{2}/\d{4})", "DOB"),
-        (r"(SSN:)\s*([0-9*]{3}-[0-9*]{2}-[0-9*]{4})", "SSN"), # Capture the word boundary and SSN
-        (r"(Phone:)\s*(\d{3}-\d{3}-\d{4})", "PHONE"),
-        (r"(email:|Email:)\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})", "EMAIL"),
-        (r"(Medicaid account:|Account:)\s*(\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b)", "ACCOUNT"),
         (r"(Hospital name:|Hospital Name:)\s*(\w+(?: \w+)+)", "HOSPITAL"),
+    ],
+    "ADDRESS_MATCHERS": [
+        (
+            r"(Address:)\s*((?:[^,\n]+?)(?:,\s*Apt\s*(?:[^\n,]+?))?(?:,\s*)(?:[^,\n]+?,\s*)?(?:[A-Z]{2})\s*(?:\d{5}(?:-\d{4})?))",
+            "ADDRESS"),
+    ],
+    "DOB_MATCHERS": [
+        (r"(Date of Birth:|DoB:|DOB:)\s*(\d{2}/\d{2}/\d{4})", "DOB"),
+    ],
+    "DATE_MATCHERS": [
+       (r"(\s*)(\d{2}/\d{2}/\d{4})", "DATE"),
+    ],
+    "SSN_MATCHERS": [
+        (r"(SSN:)\s*([0-9*]{3}-[0-9*]{2}-[0-9*]{4})", "SSN"),
+    ],
+    "PHONE_MATCHERS": [
+        (r"(Phone:)\s*(\d{3}-\d{3}-\d{4})", "PHONE"),
+        (r"(Fax number:|Fax no\.:)\s*(\d{3}-\d{3}-\d{4})", "NUMBER"),
+    ],
+    "EMAIL_MATCHERS": [
+        (r"(email:|Email:)\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})", "EMAIL"),
+    ],
+    "ACCOUNT_MATCHERS": [
+        (r"(Medicaid account:|Account:)\s*(\b\d{4}\s\d{4}\s\d{4}\s\d{4}\b)", "ACCOUNT"),
+    ],
+    "LAB_MATCHERS": [
         (r"(Lab Results\s*(?:\((?:[0-1]?[0-9]/[0-3]?[0-9]/\d{4})\))?:)\s*((?:\n-\s*.+)+)", "LAB"),
-        (r"(Allergies:)((?:\n-?\s(?![\w ]+:).+)+)", "ALLERGIES"),
         (r"(Lab Results\s*(?:\((?:[0-1]?[0-9]/[0-3]?[0-9]/\d{4})\))?:)((?:\n-?\s(?!Follow+).+)+)", "LAB"),
+    ],
+    "ALLERGIES_MATCHERS": [
+        (r"(Allergies:)((?:\n-?\s(?![\w ]+:).+)+)", "ALLERGIES"),
+    ],
+    "ID_MATCHERS": [
         (r"(Health plan beneficiary number:)\s*(\d{3}-\d{4}-\d{4})", "NUMBER"),
-        (r"(Device identifier:)\s*([A-Za-z0-9]{6}-[A-Za-z0-9]{8})", "NUMBER"),
-        (r"(Pacemaker serial numbers:)\s*([A-Za-z0-9]{5}-[A-Za-z0-9]{7})", "NUMBER"),
         (r"(Medical record number:)\s*([A-Za-z0-9]{7}-[A-Za-z0-9]{7})", "NUMBER"),
         (r"(license number:)\s*([A-Za-z0-9]{4}-[A-Za-z0-9]{6})", "NUMBER"),
         (r"(Certificate number:)\s*([A-Za-z0-9]{6}-[A-Za-z0-9]{4})", "NUMBER"),
         (r"(Health Insurance:)\s*([A-Za-z0-9]{5}-[A-Za-z0-9]{10})", "NUMBER"),
         (r"(Group no\.:)\s*(\d{6})", "NUMBER"),
-        (r"(Fax number:|Fax no\.:)\s*(\d{3}-\d{3}-\d{4})", "NUMBER"),
-        (r"(URL:)\s*((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))*\))+(?:\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))", "URL"),
         (r"(Code:)\s*(\d+)", "NUMBER"),
+    ],
+    "SERIAL_MATCHERS": [
+        (r"(Device identifier:)\s*([A-Za-z0-9]{6}-[A-Za-z0-9]{8})", "NUMBER"),
+        (r"(Pacemaker serial numbers:)\s*([A-Za-z0-9]{5}-[A-Za-z0-9]{7})", "NUMBER"),
+    ],
+    "URL_MATCHERS": [
+        (
+            r"(URL:)\s*((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))*\))+(?:\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))",
+            "URL"),
     ]
+}
+
+
+# De-identifies EHR text by iteratively replacing only the sensitive information to keep track of what was replaced.
+def deidentify_ehr_iterative_selective(text, patterns: list[tuple] = []):
+    replaced_counts = {}
+    de_id_map = {}
+    updated_text = text
+
+    # cant deidentify if no matchers are passed
+    if len(patterns) == 0:
+        return updated_text, de_id_map
 
     previous_text = None
     while previous_text != updated_text:
@@ -586,6 +664,7 @@ def deidentify_ehr_iterative_selective(text):
             )
 
     return updated_text, de_id_map
+
 
 def reidentify_ehr(text, id_map):
     # This regex matches [TYPE#123] format
@@ -599,3 +678,43 @@ def reidentify_ehr(text, id_map):
         return id_map.get(key, match.group(0))
 
     return pattern.sub(replace, text)
+
+def regex_deidentify(txt, regex_list):
+   txt = txt.replace("\r\n", "\n").rstrip()
+   matcher_list = []
+   
+   for category in regex_list:
+      matcher_list += MATCHER_MAP[category]
+
+   deidentified_ehr, id_map = deidentify_ehr_iterative_selective(txt, matcher_list)
+   return deidentified_ehr, id_map
+
+
+
+# with(open("ehr JMS.txt") as phi2):
+#     ehr_text = ''.join(list(phi2.readlines()))
+
+#     matcher_list = []
+#     for category in [
+#         "NAME_MATCHERS",
+#         "ADDRESS_MATCHERS",
+#         "DOB_MATCHERS",
+#         "SSN_MATCHERS",
+#         "PHONE_MATCHERS",
+#         "EMAIL_MATCHERS",
+#         "ACCOUNT_MATCHERS",
+#         "LAB_MATCHERS",
+#         "ALLERGIES_MATCHERS",
+#         "ID_MATCHERS",
+#         "SERIAL_MATCHERS",
+#         "URL_MATCHERS"
+#     ]:
+#         matcher_list += MATCHER_MAP[category] or []
+
+#     # Apply the selective iterative de-identification function
+#     deidentified_ehr, id_map = deidentify_ehr_iterative_selective(ehr_text, matcher_list)
+#     print(deidentified_ehr, id_map)
+
+#     # prin reidentified text
+#     reidentified_text = reidentify_ehr(deidentified_ehr, id_map)
+#     print(reidentified_text)
