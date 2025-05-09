@@ -22,5 +22,6 @@ Biometric Identifier: Replace any information related to biometrics with '*biome
 Unique ID or Code: Replace any unique identifying numbers, characteristics, or codes with '*id*. If the id has multiple components that are separated by characters like -, /, _, remove all components and separaters too.'
 Provider Name: Replace each provider name with the string '*provider*'
 Hospital Name: Replace clinic and hospital names with the string '*hospital*'
-Allergies: Replace all allergies with the string '*allergies*'
+Allergies: Replace all allergies with the string '*allergies*'.
 Lab Results: Replace all lab results and the type of the lab result in the lab results section with the string '*lab_results*'
+Medication: Replace all names of medications and drugs, along with any dosage information with the string '*medication*'

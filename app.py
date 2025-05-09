@@ -34,7 +34,7 @@ st.set_page_config(
 
 
 
-phi_list = ["Doc Name", "Patient Name", "All Names", "Social Worker Names", "Date of Birth", "All Dates", "Phone Number", "Fax Number", "Address", "Email", "SSN", "Medicaid Account", "Medical Record Number", "Health Plan Beneficiary Number", "All Account Numbers", "Certificate/License Number", "Serial Number", "Device Identifier", "URL", "IP Address", "Biometric Identifier", "Unique ID or Code", "Provider Name", "Hospital Name", "Allergies", "Lab Results"]
+phi_list = ["Doc Name", "Patient Name", "All Names", "Social Worker Names", "Date of Birth", "All Dates", "Phone Number", "Fax Number", "Address", "Email", "SSN", "Medicaid Account", "Medical Record Number", "Health Plan Beneficiary Number", "All Account Numbers", "Certificate/License Number", "Serial Number", "Device Identifier", "URL", "IP Address", "Biometric Identifier", "Unique ID or Code", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medication"]
 
 phi_dict = {}
 
@@ -479,7 +479,7 @@ def generate_passcode():
 phi_counts = dict()
 # reid_dict = 
 
-deid_tags = ["name", "dob", "date", "phone", "fax", "address", "email", "ssn", "medicaid", "record_no", "health_plan_no", "account_no", "license", "serial", "device", "url", "ip_address", "biometric", "id", "provider", "hospital", "allergies", "lab_results"]
+deid_tags = ["name", "dob", "date", "phone", "fax", "address", "email", "ssn", "medicaid", "record_no", "health_plan_no", "account_no", "license", "serial", "device", "url", "ip_address", "biometric", "id", "provider", "hospital", "allergies", "lab_results", "medication"]
 
 deid_counts = [1 for tag in deid_tags]
 
