@@ -64,8 +64,9 @@ regex_match_dict = {
 
 regex_phi_dict = {}
 regex_phi_dict["All PHI"] = list(regex_match_dict.keys())
-regex_phi_dict["PHI List 3"] = ["Name", "Address", "Dates", "Phone", "SSN", "Email", "Account Numbers", "ID", "Serial Numbers", "URLs"]
-regex_phi_dict["PHI List 1"] = ["Name", "Address", "Date of Birth", "Phone", "SSN", "Email"]
+regex_phi_dict["PHI Regex 3"] = ["Name", "Address", "Dates", "Phone", "SSN", "Email", "Account Numbers", "ID", "Serial Numbers", "URLs"]
+regex_phi_dict["PHI Regex 2"] = ["Name", "Phone", "Date of Birth", "SSN", "Address", "Email", "Allergies", "Lab Results", "Account Numbers"]
+regex_phi_dict["PHI Regex 1"] = ["Name", "Address", "Date of Birth", "Phone", "SSN", "Email"]
 
 with open("prompts.yaml", "r") as prompt_file:
    phi_prompts = yaml.safe_load(prompt_file)
