@@ -331,13 +331,16 @@ if st.session_state.state < 2:
    if st.session_state.file == None:
       st.session_state.file = st.file_uploader(label = "Upload file here.", type=['txt', 'md'])
 
+      st.write("")
       st.markdown("""**Heid** provides a powerful and intuitive way to safeguard patient privacy by removing Personal Health Information (PHI) from your documents. Whether you're preparing data for research, sharing records securely, or ensuring compliance, you have complete control over the process.
 
 *   **Dual De-identification Methods:** Choose between a high-precision RegEx engine for predictable results or leverage our advanced AI model (LLM) for context-aware detection of sensitive data.
 *   **Granular PHI Selection:** Don't settle for a one-size-fits-all approach. Use the sidebar to select exactly which categories of information to remove, from names and addresses to specific medical record numbers.
 *   **Secure & Reversible Process:** Your original data is never stored. After de-identification, you can optionally download a password-encrypted re-identification key, allowing you to securely restore the original document whenever you need it.
 
-**Ready to start?** Simply drag and drop your TXT or MD file into the uploader above to begin.""")
+**Ready to start?** Simply drag and drop your TXT or MD file into the uploader above to begin.
+
+**If you have a deidentified record and want to reidentify please click on the Reidentify tab in the left sidebar.""")
 
       
       
@@ -352,10 +355,15 @@ if st.session_state.state < 2:
       st.write("")
       st.subheader(f"Your Input Record - {st.session_state.file.name}")     
       st.write("")
+      st.markdown("""Review your document below. You can adjust your chosen de-identification method (LLM or RegEx) and select which types of information you would like removed in the sidebar.\n
+Use LLM for a more robust context-aware removal method, or use traditional RegEx for fast predictable results.\n
+Click Deidentify Record to proceed when you are ready.\n
+""")
       state = st.button("Deidentify Record", icon=":material/start:", on_click = deidentify)
 
       if st.session_state.method == "LLM":
          st.session_state.include_type = st.checkbox(label="**Include Info Types in Deidentified Record**", value = True) 
+         st.markdown("""> The "Include Info Types" checkbox lets you choose your output format. If checked, personal data is replaced with descriptive type tags like [NAME] or [ADDRESS]. If unchecked, all removed data will be labeled [REMOVED] for maximum privacy.""")
       st.divider()
       st.text(st.session_state.input)
       
@@ -371,8 +379,21 @@ elif st.session_state.state == 2:
    # Put these deidentified items in a dictionary, or write them to a file
    # Take those items and hash them or whatever you need to do for reidentification
 
-   st.subheader("""✅ Record Deidentified!""")
+   st.subheader("""✅ Process Complete! Record is Now De-identified!""")
    download_name = os.path.splitext(st.session_state.file.name)[0] + "-deidentified.txt"
+   
+   st.markdown("""Below is a preview of your sanitized document. All selected Personal Health Information (PHI) has been replaced with placeholder tags according to your settings. You can now download this de-identified record for your use.
+
+**Want the ability to reverse this process later?**
+
+The **Re-identification Map** is a secure, encrypted file that acts as the key to restore your original document from this de-identified version.
+
+*   When you click "Get Reidentification Map," you will be prompted to create a password.
+*   This password encrypts the map file, making it completely unreadable to anyone without it.
+*   To restore the data, you will need three things: the de-identified record, this encrypted map file, and your password.
+
+**Important: We do not store your password or your data.** If you lose your password or the map file, it will be **impossible** to restore the original information. Please store both items in a safe and secure location.""")
+   
    st.download_button(label="Download Deidentified Record", icon=":material/download:", data=st.session_state.output, file_name=download_name, mime="text/plain")
 
    if(st.session_state.reid_map is not None):
@@ -384,6 +405,9 @@ elif st.session_state.state == 2:
    
 elif st.session_state.state == 3:
    st.subheader("📟 Reidentify Record")
+   st.markdown("""Have a de-identified record to restore? To begin the re-identification process, please provide the three required items: your de-identified .txt file, your .map key file, and the password you used to encrypt it.
+
+The restoration process is performed securely on your device. Your data is never uploaded.""")
    st.session_state.file = st.file_uploader(label = "Upload DEIDENTIFIED record here.", type=['txt', 'md'])
 
    st.session_state.reid_map = st.file_uploader(label = "Upload REIDENTIFICATION map here.", type=['map'])
@@ -391,7 +415,7 @@ elif st.session_state.state == 3:
    st.write("")
    st.write("")
 
-   st.markdown("##### Please enter the passcode for the reidentification map:")
+   st.markdown("***Please enter the passcode for the reidentification map:***")
    input_password = st.text_input(label="", key="customcode", type="password")
 
    if input_password and st.session_state.file is not None and st.session_state.reid_map is not None:
@@ -443,6 +467,7 @@ elif st.session_state.state == 3:
 
 elif st.session_state.state == 4:
    st.subheader("""✅ Record Reidentified!""")
+   st.markdown("Please review and download your restored record below.")
    download_name = os.path.splitext(st.session_state.file.name)[0] + "-reidentified.txt"
    st.download_button(label="Download Reidentified Record", icon=":material/download:", data=st.session_state.output, file_name=download_name, mime="text/plain")
    #st.text(st.session_state.input)
@@ -451,7 +476,7 @@ elif st.session_state.state == 4:
    st.text(st.session_state.output)
 elif st.session_state.state == 5:
    st.subheader("📑 Get Reidentification Map")
-   st.markdown("**To download the reidentification map, please enter or generate a passcode for encryption. You must *use* this passcode later to reidentify the record. Store it in a safe place.**")
+   st.markdown("**To download the reidentification map, please enter or generate a passcode for encryption. You must use this passcode later to reidentify the record. Store it in a safe place.**")
 
    if "pass_vis" not in st.session_state:
       st.session_state.pass_vis = False
