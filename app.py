@@ -340,7 +340,7 @@ if st.session_state.state < 2:
 
 **Ready to start?** Simply drag and drop your TXT or MD file into the uploader above to begin.
 
-**If you have a deidentified record and want to reidentify please click on the Reidentify tab in the left sidebar.""")
+**If you have a deidentified record and want to reidentify please click on the Reidentify tab in the left sidebar.**""")
 
       
       
