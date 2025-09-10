@@ -29,7 +29,7 @@ load_dotenv()
 client = genai.Client()
 
 st.set_page_config(
-        page_title="DeIdentify Health Info",
+        page_title="Heid: Deidentify Health Data",
 )
 
 
