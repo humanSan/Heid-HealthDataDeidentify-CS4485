@@ -330,6 +330,16 @@ if st.session_state.state < 2:
       st.subheader("🧮 Deidentify Record")
    if st.session_state.file == None:
       st.session_state.file = st.file_uploader(label = "Upload file here.", type=['txt', 'md'])
+
+      st.markdown("""**Heid** provides a powerful and intuitive way to safeguard patient privacy by removing Personal Health Information (PHI) from your documents. Whether you're preparing data for research, sharing records securely, or ensuring compliance, you have complete control over the process.
+
+      *   **Dual De-identification Methods:** Choose between a high-precision RegEx engine for predictable results or leverage our advanced AI model (LLM) for context-aware detection of sensitive data.
+      *   **Granular PHI Selection:** Don't settle for a one-size-fits-all approach. Use the sidebar to select exactly which categories of information to remove, from names and addresses to specific medical record numbers.
+      *   **Secure & Reversible Process:** Your original data is never stored. After de-identification, you can optionally download a password-encrypted re-identification key, allowing you to securely restore the original document whenever you need it.
+
+      **Ready to start?** Simply drag and drop your TXT or MD file into the uploader below to begin.""")
+
+      
       
    if st.session_state.file is not None:
       if(st.session_state.state==0):
