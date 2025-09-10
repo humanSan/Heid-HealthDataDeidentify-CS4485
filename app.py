@@ -353,8 +353,6 @@ if st.session_state.state < 2:
       stringio = StringIO(data.decode())
       st.session_state.input = stringio.read()
       st.write("")
-      st.subheader(f"Your Input Record - {st.session_state.file.name}")     
-      st.write("")
       st.markdown("""Review your document below. You can adjust your chosen de-identification method (LLM or RegEx) and select which types of information you would like removed in the sidebar.\n
 Use LLM for a more robust context-aware removal method, or use traditional RegEx for fast predictable results.\n
 Click Deidentify Record to proceed when you are ready.\n
@@ -365,6 +363,9 @@ Click Deidentify Record to proceed when you are ready.\n
          st.session_state.include_type = st.checkbox(label="**Include Info Types in Deidentified Record**", value = True) 
          st.markdown("""> The "Include Info Types" checkbox lets you choose your output format. If checked, personal data is replaced with descriptive type tags like [NAME] or [ADDRESS]. If unchecked, all removed data will be labeled [REMOVED] for maximum privacy.""")
       st.divider()
+      
+      st.subheader(f"Your Input Record - {st.session_state.file.name}")     
+
       st.text(st.session_state.input)
       
 elif st.session_state.state == 2:
