@@ -108,7 +108,7 @@ if 'encrypted_map' not in st.session_state:
 if 'include_type' not in st.session_state:
    st.session_state.include_type = None
 
-st.header("🧬 Health Data Deidentifier")
+st.header("🧬 Heid: Health Data Deidentifier")
 
 def goDeid():
    st.session_state.state = 0
