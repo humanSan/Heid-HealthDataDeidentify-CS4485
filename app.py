@@ -407,8 +407,7 @@ The **Re-identification Map** is a secure, encrypted file that acts as the key t
 elif st.session_state.state == 3:
    st.subheader("📟 Reidentify Record")
    st.markdown("""Have a de-identified record to restore? To begin the re-identification process, please provide the three required items: your de-identified .txt file, your .map key file, and the password you used to encrypt it.
-
-The restoration process is performed securely on your device. Your data is never uploaded.""")
+""")
    st.session_state.file = st.file_uploader(label = "Upload DEIDENTIFIED record here.", type=['txt', 'md'])
 
    st.session_state.reid_map = st.file_uploader(label = "Upload REIDENTIFICATION map here.", type=['map'])
