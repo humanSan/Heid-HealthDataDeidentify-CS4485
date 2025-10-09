@@ -34,7 +34,6 @@ st.set_page_config(
 )
 
 
-
 phi_list = ["Doc Name", "Patient Name", "All Names", "Social Worker Names", "Date of Birth", "All Dates", "Phone Number", "Fax Number", "Address", "Email", "SSN", "Medicaid Account", "Medical Record Number", "Health Plan Beneficiary Number", "All Account Numbers", "Certificate/License Number", "Serial Number", "Device Identifier", "URL", "IP Address", "Biometric Identifier", "Unique ID or Code", "Provider Name", "Hospital Name", "Allergies", "Lab Results", "Medication"]
 
 phi_dict = {}
@@ -170,9 +169,6 @@ def reidentify(ehr_text, reid_map):
    return text
 
 def deidentify(include_type = True):
-   phiList = []
-   with(open("phi2.txt") as phi2):
-      phiList = phi2.readlines()
 
    method = st.session_state.method
    
