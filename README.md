@@ -22,8 +22,8 @@ Heid is a powerful and intuitive web application that safeguards patient privacy
 
 ## 🛠️ Technology Stack
 
-*   **Application Framework**: Streamlit
 *   **Language**: Python
+*   **UI Framework**: Streamlit
 *   **AI/LLM**: Google Gemini API
 *   **Encryption**: Python `cryptography` library (Fernet, PBKDF2HMAC)
 *   **Text**: PyYAML, RegEx
@@ -74,7 +74,7 @@ Launch the Streamlit app with the following command:
 ```sh
 streamlit run app.py
 ```
-Open your web browser and navigate to `http://localhost:8501`.
+The app should launch in your browser automatically. If it doesn't, try opening `http://localhost:8501` in your browser.
 
 ## ⚙️ How It Works
 
